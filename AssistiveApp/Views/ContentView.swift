@@ -2,9 +2,6 @@
 //  ContentView.swift
 //  AssistiveApp
 //
-//  Created by Developer on [Date].
-//  Main view utilizing a TabView to navigate across primary app functions.
-//
 
 import SwiftUI
 

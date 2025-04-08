@@ -5,14 +5,6 @@
 //  Created by Haven F on 4/7/25.
 //
 
-
-//
-//  ARScannerTabView.swift
-//  AssistiveApp
-//
-//  Created by Developer on [Date].
-//  A wrapper view that embeds an AR experience (using ARKit) to simulate scanning.
-//  Future development can add QR code/image recognition.
  
 import SwiftUI
 import ARKit

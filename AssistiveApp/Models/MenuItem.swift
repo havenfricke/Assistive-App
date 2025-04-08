@@ -17,9 +17,9 @@ class MenuItem: Identifiable {
     var imageName: String?   // Name of the image asset
     var allergens: [String]? // List of allergens contained in the menu item
     
-    init(name: String, description: String? = nil, imageName: String? = nil, allergens: [String]? = nil) {
+    init(name: String, descriptor: String? = nil, imageName: String? = nil, allergens: [String]? = nil) {
         self.name = name
-        self.descriptor = description
+        self.descriptor = descriptor
         self.imageName = imageName
         self.allergens = allergens
     }

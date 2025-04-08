@@ -1,10 +1,6 @@
 //
 //  AssistiveApp.swift
 //  AssistiveApp
-//
-//  Created by Developer on [Date].
-//  Main app entry point and ModelContainer setup using SwiftData.
-//
 
 import SwiftUI
 import SwiftData
