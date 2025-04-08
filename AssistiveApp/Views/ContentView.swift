@@ -1,0 +1,31 @@
+//
+//  ContentView.swift
+//  AssistiveApp
+//
+//  Created by Developer on [Date].
+//  Main view utilizing a TabView to navigate across primary app functions.
+//
+
+import SwiftUI
+
+struct ContentView: View {
+    var body: some View {
+        TabView {
+            HomeView()
+                .tabItem { Label("Home", systemImage: "house") }
+            ARScannerTabView()
+                .tabItem { Label("Scan", systemImage: "qrcode.viewfinder") }
+            MenuListView()
+                .tabItem { Label("Menu", systemImage: "menucard") }
+            OrderView()
+                .tabItem { Label("Order", systemImage: "cart") }
+            SettingsView()
+                .tabItem { Label("Settings", systemImage: "gearshape") }
+        }
+    }
+}
+
+#Preview {
+    ContentView()
+        .modelContainer(for: [MenuItem.self, Order.self, Location.self], inMemory: true)
+}
