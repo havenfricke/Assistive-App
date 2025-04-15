@@ -7,12 +7,13 @@ import SwiftData
 
 @main
 struct AssistiveApp: App {
-    // Create a shared model container with our registered models.
     var sharedContainer: ModelContainer = {
         let schema = Schema([
             MenuItem.self,
             Order.self,
-            Location.self
+            Location.self,
+            Customer.self,
+            LocationTag.self
         ])
         let modelConfig = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
         do {
