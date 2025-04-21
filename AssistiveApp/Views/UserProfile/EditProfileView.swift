@@ -56,7 +56,7 @@ struct EditProfileView: View {
             // MARK: - Allergens
             Section(header: Text("Allergens")) {
                 NavigationLink("Edit Allergen List") {
-                    // AllergenPickerView(selectedAllergens: $profile.allergens)
+                    AllergenPickerView(selectedAllergens: $profile.allergens)
                 }
             }
 

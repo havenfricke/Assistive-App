@@ -86,6 +86,23 @@ struct ProfileView: View {
                         .font(.footnote)
                         .foregroundColor(.gray)
                 }
+                Button("Print Profile JSON") {
+                    if let jsonData = profile.toJSON(),
+                       let jsonString = String(data: jsonData, encoding: .utf8) {
+                        print("🧾 Profile JSON:\n\(jsonString)")
+                    } else {
+                        print("❌ Failed to encode profile")
+                    }
+                }
+                NavigationLink("Debug Image Decode") {
+                    if let data = profile.profileImage {
+                        let base64 = data.base64EncodedString()
+                        ImageDecodeTestView(base64String: base64)
+                    } else {
+                        ImageDecodeTestView(base64String: "")
+                    }
+                }
+
                 
             }
             .navigationTitle("Your Profile")
@@ -97,4 +114,5 @@ struct ProfileView: View {
         formatter.timeStyle = .short
         return formatter.string(from: date)
     }
+    
 }
