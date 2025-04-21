@@ -16,8 +16,8 @@ struct ContentView: View {
                 .tabItem { Label("Menu", systemImage: "menucard") }
             OrderView()
                 .tabItem { Label("Order", systemImage: "cart") }
-            SettingsView()
-                .tabItem { Label("Settings", systemImage: "gearshape") }
+            ProfileView(profile:MobilityProfile())
+                .tabItem { Label("Profile View", systemImage: "gearshape") }
         }
     }
 }
