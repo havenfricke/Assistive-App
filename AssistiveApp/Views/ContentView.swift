@@ -16,6 +16,8 @@ struct ContentView: View {
                 .tabItem { Label("Menu", systemImage: "menucard") }
             OrderView()
                 .tabItem { Label("Order", systemImage: "cart") }
+            NavView()
+                .tabItem { Label("Nav", systemImage: "arrowshape.turn.up.right") }
             SettingsView()
                 .tabItem { Label("Settings", systemImage: "gearshape") }
         }
