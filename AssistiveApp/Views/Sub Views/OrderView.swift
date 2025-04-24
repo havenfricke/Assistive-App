@@ -10,9 +10,9 @@ import SwiftUI
 
 struct OrderView: View {
     // In a real scenario, selected items might be populated from user selections in the menu.
-    @State private var selectedItems: [MenuItem] = []
+    @State private var selectedItems: [FoodItem] = []
     @State private var userAllergens: [String] = []  // e.g., populated via Settings or user input
-    @State private var filteredItems: [MenuItem] = []
+    @State private var filteredItems: [FoodItem] = []
     
     // Controller that applies a default allergen filter.
     let orderController = OrderController(filter: DefaultAllergenFilter())
@@ -22,7 +22,7 @@ struct OrderView: View {
             VStack {
                 List {
                     Section(header: Text("Selected Items")) {
-                        ForEach(selectedItems) { item in
+                        ForEach(filteredItems) { item in
                             Text(item.name)
                         }
                     }

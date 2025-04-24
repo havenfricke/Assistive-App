@@ -17,7 +17,7 @@ struct AppRouterView: View{
         Divider()
         }
             if isStaff{
-                ContentView() // Replace with Kevin's Staff View when ready.
+                StaffView() // Replace with Kevin's Staff View when ready.
             } else {
                 ContentView()
             }

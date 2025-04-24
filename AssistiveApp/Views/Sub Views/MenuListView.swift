@@ -10,88 +10,61 @@ import SwiftUI
 import SwiftData
 
 struct MenuListView: View {
-    // SwiftData query to fetch MenuItem models.
-    @Query private var menuItems: [MenuItem]
-    @State private var selectedMenuItem: MenuItem?
-    // Added states for allergen filtering
-    @State private var selectedAllergens: [String] = []
-    @State private var filterStrategy: AllergenFilterStrategy = DefaultAllergenFilter()
-    // Hard coded test data
-    @State private var localMenuItems: [MenuItem] = [
-        MenuItem(name: "Burger", descriptor: "Beef with cheese", price: 9.99, imageName: "burger", allergens: ["Dairy", "Gluten"], accessibilityInfo: "Cut into quarters"),
-        MenuItem(name: "Salad", descriptor: "Fresh garden salad", price: 6.49, imageName: "salad", allergens: ["Soy"], accessibilityInfo: "Dressing on side"),
-        MenuItem(name: "Fries", descriptor: "Crispy fries", price: 3.99, imageName: "fries", allergens: nil, accessibilityInfo: nil)
-    ]
-
-    // Calls localMenuItems instead of menuItems for testing
-    var filteredItems: [MenuItem] {
-        filterStrategy.filter(menuItems: localMenuItems, allergens: selectedAllergens)
-    }
-
+    @ObservedObject var viewModel: MenuViewModel
 
     var body: some View {
         NavigationView {
             VStack(alignment: .leading) {
                 Spacer().frame(height: 20)
+                
+                // Allergen Filter UI
                 Text("Filter by Allergens")
                     .font(.headline)
                     .padding(.horizontal)
-
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack {
-                        ForEach(["Peanuts", "Dairy", "Gluten", "Soy"], id: \.self) { allergen in
-                            Button(action: {
-                                if selectedAllergens.contains(allergen) {
-                                    selectedAllergens.removeAll { $0 == allergen }
-                                } else {
-                                    selectedAllergens.append(allergen)
-                                }
-                            }) {
-                                Text(allergen)
-                                    .padding(8)
-                                    .background(selectedAllergens.contains(allergen) ? Color.red : Color.gray.opacity(0.3))
-                                    .cornerRadius(8)
-                                    .foregroundColor(.white)
-                            }
-                        }
-                    }
-                    .padding(.horizontal)
-                }
                 
-
-                List(selection: $selectedMenuItem) {
-                    ForEach(filteredItems) { item in
-                        NavigationLink(value: item) {
-                            MenuItemRow(item: item)
+                if let menuData = viewModel.menuData {
+                    Picker("Category", selection: $viewModel.selectedCategoryIndex){
+                        ForEach(menuData.categories.indices, id: \.self){index in
+                            Text(menuData.categories[index].name).tag(index)
                         }
                     }
+                    .pickerStyle(SegmentedPickerStyle())
+                    .padding()
+                    
+                    // Item List
+                    List {
+                        ForEach(viewModel.currentItems, id: \.name){ item in
+                            FoodItemRow(item:item)
+                        }
+                    }
+                } else{
+                    Spacer()
+                    Text("Waiting for Menu Data ...")
+                        .foregroundColor(.gray)
+                        .frame(maxWidth: .infinity, alignment: .center)
+                    Spacer()
                 }
-                Spacer()
             }
             .padding(.top)
             .navigationTitle("Menu")
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(action: { WebServiceManager.fetchMenuData() }) {
-                        Label("Refresh", systemImage: "arrow.clockwise")
-                    }
-                }
-            }
         }
     }
 }
 
-struct MenuItemRow: View {
-    let item: MenuItem
+// MARK: - FoodItemRow for display
+struct FoodItemRow: View {
+    let item: FoodItem
 
     var body: some View {
         HStack {
-            if let imageName = item.imageName {
-                Image(imageName)
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 60, height: 60)
-                    .clipShape(RoundedRectangle(cornerRadius: 8))
+            if let imageName = item.imageURL, let url = URL(string: imageName) {
+                AsyncImage(url: url) { image in
+                    image.resizable()
+                } placeholder: {
+                    ProgressView()
+                }
+                .frame(width: 60, height: 60)
+                .clipShape(RoundedRectangle(cornerRadius: 8))
             } else {
                 Image(systemName: "photo")
                     .frame(width: 60, height: 60)
@@ -101,8 +74,8 @@ struct MenuItemRow: View {
                 Text(item.name)
                     .font(.headline)
 
-                if let descriptor = item.descriptor {
-                    Text(descriptor)
+                if let description = item.description {
+                    Text(description)
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                 }
@@ -110,20 +83,89 @@ struct MenuItemRow: View {
                 Text(String(format: "$%.2f", item.price))
                     .font(.subheadline)
 
-                if let allergens = item.allergens, !allergens.isEmpty {
-                    Text("Contains: \(allergens.joined(separator: ", "))")
+                if !item.allergens.isEmpty {
+                    Text("Contains: \(item.allergens.joined(separator: ", "))")
                         .font(.caption)
                         .foregroundColor(.red)
-                }
-
-                if let accessibility = item.accessibilityInfo {
-                    Text("Accessibility: \(accessibility)")
-                        .font(.caption2)
-                        .foregroundColor(.blue)
                 }
             }
         }
         .padding(.vertical, 6)
     }
+}
+
+#Preview {
+    let viewModel = MenuViewModel()
+
+    // Create test menu data
+    let testMenuData = MenuData(
+        locationID: "test-location-001",
+        locationName: "Prototype Cafe",
+        categories: [
+            MenuCategory(
+                name: "Food",
+                items: [
+                    FoodItem(
+                        name: "Avocado Toast",
+                        description: "Sourdough with smashed avocado and lemon",
+                        price: 6.50,
+                        allergens: ["Gluten"],
+                        imageURL: nil
+                    ),
+                    FoodItem(
+                        name: "Vegan Wrap",
+                        description: "Chickpeas, spinach, and tahini",
+                        price: 7.75,
+                        allergens: ["Sesame"],
+                        imageURL: nil
+                    )
+                ]
+            ),
+            MenuCategory(
+                name: "Coffee",
+                items: [
+                    FoodItem(
+                        name: "Espresso",
+                        description: "Strong and small",
+                        price: 2.50,
+                        allergens: [],
+                        imageURL: nil
+                    ),
+                    FoodItem(
+                        name: "Latte",
+                        description: "Espresso with steamed milk",
+                        price: 3.75,
+                        allergens: ["Dairy"],
+                        imageURL: nil
+                    )
+                ]
+            ),
+            MenuCategory(
+                name: "Tea",
+                items: [
+                    FoodItem(
+                        name: "Chamomile",
+                        description: "Caffeine-free herbal tea",
+                        price: 2.25,
+                        allergens: [],
+                        imageURL: nil
+                    ),
+                    FoodItem(
+                        name: "Matcha",
+                        description: "Green tea powder with water or milk",
+                        price: 4.00,
+                        allergens: ["Dairy"],
+                        imageURL: nil
+                    )
+                ]
+            )
+        ]
+    )
+
+    // Simulate PayloadRouter receiving a payload
+    let testPayload = try! Payload(type: .menuData, model: testMenuData)
+    PayloadRouter.shared.handle(payload: testPayload)
+
+    return MenuListView(viewModel: viewModel)
 }
 

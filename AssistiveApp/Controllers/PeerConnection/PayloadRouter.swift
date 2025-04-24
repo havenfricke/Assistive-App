@@ -33,7 +33,7 @@ class PayloadRouter
                 onReceiveHelpRequest?()
             case .sendDirections:
                 if let directions = try? payload.decode(as: RoutePath.self){
-                    onReceiveDirectio   ns?(directions)
+                    onReceiveDirections?(directions)
                 }
             case .drawPath:
                 if let points = try? payload.decode(as: [CGPoint].self){

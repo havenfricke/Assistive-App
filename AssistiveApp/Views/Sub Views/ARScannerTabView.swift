@@ -1,22 +1,49 @@
 import SwiftUI
+import SwiftData
 import ARKit
 import SceneKit
 import Vision
 import CoreML
 
+
 struct ARScannerTabView: View {
+    @Query var profiles: [MobilityProfile]
+    
     var body: some View {
         NavigationStack {
-            ARScannerViewWrapper()
-                .ignoresSafeArea()
+            if let profile = profiles.first {
+                ARScannerViewWrapper(profile: profile)
+                    .ignoresSafeArea()
+                    .navigationTitle("AR Scanner")
+            } else {
+                VStack(spacing: 16) {
+                    Text("No mobility profile found.")
+                        .font(.headline)
+                        .multilineTextAlignment(.center)
+                    Text("Please create your profile to use AR features.")
+                        .font(.subheadline)
+                        .foregroundColor(.gray)
+                        .multilineTextAlignment(.center)
+
+                    NavigationLink("Create Profile"){
+                        ProfileView(profile:MobilityProfile())
+                    }
+                }
+                .padding()
                 .navigationTitle("AR Scanner")
+            }
         }
     }
 }
 
 struct ARScannerViewWrapper: UIViewRepresentable {
+    let profile: MobilityProfile
     func makeCoordinator() -> Coordinator {
-        Coordinator()
+        return Coordinator(
+            peerConnectionManager: PeerConnectionManager.shared,
+            payloadRouter: PayloadRouter.shared,
+            mobilityProfile: profile
+        )
     }
 
     func makeUIView(context: Context) -> ARSCNView {
@@ -39,6 +66,10 @@ struct ARScannerViewWrapper: UIViewRepresentable {
     }
 
     class Coordinator: NSObject, ARSCNViewDelegate, ARSessionDelegate {
+        let peerConnectionManager: PeerConnectionManager
+        let payloadRouter: PayloadRouter
+        var mobilityProfile: MobilityProfile
+        
         let visionModel: VNCoreMLModel
         var request: VNCoreMLRequest?
         let requestHandlerQueue = DispatchQueue(label: "com.model.inference")
@@ -48,7 +79,13 @@ struct ARScannerViewWrapper: UIViewRepresentable {
         let requiredFrameCount = 5
         var hasTriggeredAction = false
 
-        override init() {
+        init(peerConnectionManager: PeerConnectionManager,
+             payloadRouter: PayloadRouter,
+             mobilityProfile: MobilityProfile) {
+            self.peerConnectionManager = peerConnectionManager
+            self.payloadRouter = payloadRouter
+            self.mobilityProfile = mobilityProfile
+
             guard let mlModel = try? AccessibilityRecognitionModel(configuration: MLModelConfiguration()).model,
                   let vnModel = try? VNCoreMLModel(for: mlModel) else {
                 fatalError("Could not load AccessibilityRecognitionModel")
@@ -58,6 +95,7 @@ struct ARScannerViewWrapper: UIViewRepresentable {
             super.init()
             self.setupRequest()
         }
+
 
         private func setupRequest() {
             self.request = VNCoreMLRequest(model: visionModel) { request, error in
@@ -88,7 +126,8 @@ struct ARScannerViewWrapper: UIViewRepresentable {
 
             self.request?.imageCropAndScaleOption = .centerCrop
         }
-
+// MARK: - Perform High Confidence Action
+        
         private func performHighConfidenceAction(identifier: String) {
             // Additional logic based on recognition here.
             print("ACTION TRIGGERED: \(identifier)")

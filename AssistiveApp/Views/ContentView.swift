@@ -12,7 +12,7 @@ struct ContentView: View {
                 .tabItem { Label("Home", systemImage: "house") }
             ARScannerTabView()
                 .tabItem { Label("Scan", systemImage: "qrcode.viewfinder") }
-            MenuListView()
+            MenuListView(viewModel: MenuViewModel())
                 .tabItem { Label("Menu", systemImage: "menucard") }
             OrderView()
                 .tabItem { Label("Order", systemImage: "cart") }
