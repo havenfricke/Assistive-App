@@ -25,7 +25,7 @@ struct AssistiveApp: App {
     
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            AppRouterView()
         }
         .modelContainer(sharedContainer)
     }
