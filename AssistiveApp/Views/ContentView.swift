@@ -6,23 +6,21 @@
 import SwiftUI
 
 struct ContentView: View {
+    let profile: MobilityProfile
+    
     var body: some View {
         TabView {
             HomeView()
                 .tabItem { Label("Home", systemImage: "house") }
-            ARScannerTabView()
+            ARScannerTabView(profile:profile)
                 .tabItem { Label("Scan", systemImage: "qrcode.viewfinder") }
             MenuListView(viewModel: MenuViewModel())
                 .tabItem { Label("Menu", systemImage: "menucard") }
             OrderView()
                 .tabItem { Label("Order", systemImage: "cart") }
-            ProfileView(profile:MobilityProfile())
+            ProfileView(profile:profile)
                 .tabItem { Label("Profile View", systemImage: "gearshape") }
         }
     }
 }
 
-#Preview {
-    ContentView()
-        .modelContainer(for: [MenuItem.self, Order.self, Location.self], inMemory: true)
-}

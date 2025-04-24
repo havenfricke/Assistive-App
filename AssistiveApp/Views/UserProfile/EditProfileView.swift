@@ -4,6 +4,7 @@ import PhotosUI
 struct EditProfileView: View {
     @Bindable var profile: MobilityProfile
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.modelContext) private var context
 
     @State private var selectedItem: PhotosPickerItem? = nil
 
@@ -73,6 +74,11 @@ struct EditProfileView: View {
             Section {
                 Button("Save and Return") {
                     profile.lastUpdated = Date()
+                    do{
+                        try context.save()
+                    } catch {
+                        print("Failed to save Mobilit Profile: \(error)")
+                    }
                     dismiss()
                 }
 

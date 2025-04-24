@@ -10,6 +10,7 @@ import SwiftUI
 struct AllergenPickerView: View{
     @Binding var selectedAllergens: [String]
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.modelContext) private var context
     
     private let commonAllergens = [
         "Milk", "Eggs", "Peanuts", "Tree Nuts",
@@ -65,6 +66,11 @@ struct AllergenPickerView: View{
                 Section {
                     Button("Save Allergens"){
                         selectedAllergens = selectedCommonAllergens() + customAllergens
+                        do{
+                            try context.save()
+                        } catch {
+                            print("Failed to save Allergen Information in Profile: \(error)")
+                        }
                         dismiss()
                     }
                 }
