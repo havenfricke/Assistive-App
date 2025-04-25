@@ -14,8 +14,8 @@
             filePath = "AssistiveApp/Controllers/PeerConnection/PeerConnectionManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "74"
-            endingLineNumber = "74"
+            startingLineNumber = "92"
+            endingLineNumber = "92"
             landmarkName = "PeerConnectionManager"
             landmarkType = "21">
          </BreakpointContent>
@@ -30,8 +30,8 @@
             filePath = "AssistiveApp/Controllers/PeerConnection/PeerConnectionManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "97"
-            endingLineNumber = "97"
+            startingLineNumber = "115"
+            endingLineNumber = "115"
             landmarkName = "session(_:didReceive:withName:fromPeer:)"
             landmarkType = "7">
          </BreakpointContent>

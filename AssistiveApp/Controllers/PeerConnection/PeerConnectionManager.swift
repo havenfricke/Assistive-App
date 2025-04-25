@@ -68,7 +68,25 @@ class PeerConnectionManager : NSObject {
         session = nil
         peerID = nil
     }
+    func send(payload: Payload){
+        guard let session = session, !session.connectedPeers.isEmpty else {
+            print("No connected peers to send payload")
+            return
+        }
+        
+        do {
+            let data = try JSONEncoder().encode(payload)
+            try session.send(data, toPeers: session.connectedPeers, with: .reliable)
+            print ("Payload sent")
+        }catch {
+            print ("Error sending payload: \(error)")
+        }
+    }
+    var hasConnectedPeers: Bool {
+        return session?.connectedPeers.isEmpty == false
+    }
 }
+
 
 // MARK: - MCSessionDelegate Compliance
 extension PeerConnectionManager: MCSessionDelegate {
@@ -83,7 +101,7 @@ extension PeerConnectionManager: MCSessionDelegate {
         case .connecting:
             print("Connecting to peer: \(peerID.displayName)")
         @unknown default:
-            print("Uknown session state for peer: \(peerID.displayName)")
+            print("Unknown session state for peer: \(peerID.displayName)")
         }
     }
     
@@ -157,3 +175,5 @@ extension PeerConnectionManager: MCNearbyServiceBrowserDelegate {
     
     
 }
+
+
