@@ -13,7 +13,6 @@ struct AssistiveApp: App {
             Order.self,
             Location.self,
             Customer.self,
-            LocationTag.self
         ])
         let modelConfig = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
         do {

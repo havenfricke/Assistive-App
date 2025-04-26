@@ -56,7 +56,7 @@ struct PayloadTestView: View {
     }
 
     private func simulateHelpRequest() {
-        let payload = try? Payload(type: .helpRequest, model: "ping") // Dummy model
+        let payload = try? Payload(type: .alertMessage, model: "ping") // Dummy model
         if let payload = payload {
             PayloadRouter.shared.handle(payload: payload)
         }
@@ -108,7 +108,7 @@ struct PayloadTestView: View {
             logMessages.append("✅ Route to \(route.destinationLabel ?? "unknown") with \(route.points.count) points")
         }
 
-        PayloadRouter.shared.onReceiveHelpRequest = {
+        PayloadRouter.shared.onReceiveAlertMessage = { alert in
             logMessages.append("🆘 Help requested")
         }
 

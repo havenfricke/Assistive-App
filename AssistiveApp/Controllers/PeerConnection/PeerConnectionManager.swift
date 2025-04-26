@@ -68,6 +68,8 @@ class PeerConnectionManager : NSObject {
         session = nil
         peerID = nil
     }
+    
+    //MARK: Send Paylod
     func send(payload: Payload){
         guard let session = session, !session.connectedPeers.isEmpty else {
             print("No connected peers to send payload")
@@ -105,10 +107,17 @@ extension PeerConnectionManager: MCSessionDelegate {
         }
     }
     
-    // Required
+    // MARK: Payload Receiving
     func session(_ session: MCSession, didReceive data: Data, fromPeer peerID: MCPeerID){
-        // This is where payloads will be routed toward
         print("Received data from \(peerID.displayName)")
+        do{
+            let payload = try JSONDecoder().decode(Payload.self, from: data)
+            PayloadRouter.shared.handle(payload:payload)
+            print("Handled payload of type: \(payload.type)")
+        }
+        catch {
+            print ("failed to decode incoming payload: \(error)")
+        }
     }
     
     //MARK: -- Unused but required.
