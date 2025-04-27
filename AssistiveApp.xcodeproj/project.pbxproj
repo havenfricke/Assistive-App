@@ -29,9 +29,22 @@
 		8B5AB7A32DA4A87000D57092 /* AssistiveAppUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AssistiveAppUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		F3D3DEFD2DBD8DCE00DF9E93 /* Exceptions for "AssistiveApp" folder in "AssistiveApp" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 8B5AB7862DA4A86D00D57092 /* AssistiveApp */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		8B5AB7892DA4A86D00D57092 /* AssistiveApp */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				F3D3DEFD2DBD8DCE00DF9E93 /* Exceptions for "AssistiveApp" folder in "AssistiveApp" target */,
+			);
 			path = AssistiveApp;
 			sourceTree = "<group>";
 		};
@@ -399,7 +412,11 @@
 				DEVELOPMENT_TEAM = LF779C475Z;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_NSCameraUsageDescription = "AR Camera Access";
+				INFOPLIST_FILE = AssistiveApp/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "";
+				INFOPLIST_KEY_NSCameraUsageDescription = "This app uses the camera for AR Scanning";
+				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "Uses thelocal network to connect users and staff";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = " Uses your photo library for uploading a profile picture";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -429,7 +446,11 @@
 				DEVELOPMENT_TEAM = LF779C475Z;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_NSCameraUsageDescription = "AR Camera Access";
+				INFOPLIST_FILE = AssistiveApp/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "";
+				INFOPLIST_KEY_NSCameraUsageDescription = "This app uses the camera for AR Scanning";
+				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "Uses thelocal network to connect users and staff";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = " Uses your photo library for uploading a profile picture";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
