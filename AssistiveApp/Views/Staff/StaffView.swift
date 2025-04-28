@@ -5,14 +5,13 @@ import MultipeerConnectivity
 struct StaffView: View {
     @StateObject private var mobilityProfileManager = MobilityProfileManager()
     @StateObject private var alertManager = AlertManager()
-    @Query private var customers: [Customer]
     
     var body: some View {
         NavigationView {
             TabView {
                 AlertInboxView(alertManager: alertManager)
                     .tabItem { Label("Alerts", systemImage: "exclamationmark.bubble") }
-                CustomerInfoView(receivedProfile: mobilityProfileManager.receivedProfile)
+                CustomerInfoView(profileManager: mobilityProfileManager)
                     .tabItem { Label("Customer Info", systemImage: "person.circle") }
 
             }
@@ -86,17 +85,23 @@ struct StaffView: View {
 
 
 class MobilityProfileManager: ObservableObject{
-    @Published var receivedProfile: MobilityProfile?
+    @Published var connectedCustomers: [ConnectedCustomer] = []
     
     init(){
         PayloadRouter.shared.onReceiveMobilityProfile = { [weak self] profile in
             DispatchQueue.main.async{
-                self?.receivedProfile = profile
+                let connection = ConnectedCustomer(profile: profile, connectedAt: Date())
+                self?.connectedCustomers.append(connection)
             }
         }
     }
 }
 
+struct ConnectedCustomer: Identifiable{
+    let id = UUID()
+    let profile: MobilityProfile
+    let connectedAt: Date
+}
 
 
 class AlertManager: ObservableObject{

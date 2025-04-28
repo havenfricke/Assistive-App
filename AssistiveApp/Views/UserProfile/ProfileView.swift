@@ -86,23 +86,14 @@ struct ProfileView: View {
                         .font(.footnote)
                         .foregroundColor(.gray)
                 }
-                Button("Print Profile JSON") {
-                    if let jsonData = profile.toJSON(),
-                       let jsonString = String(data: jsonData, encoding: .utf8) {
-                        print("🧾 Profile JSON:\n\(jsonString)")
-                    } else {
-                        print("❌ Failed to encode profile")
-                    }
+                // MARK: = Send User Profile
+                Button ("Send Profile to Staff"){
+                    sendProfileToStaff()
                 }
-                NavigationLink("Debug Image Decode") {
-                    if let data = profile.profileImage {
-                        let base64 = data.base64EncodedString()
-                        ImageDecodeTestView(base64String: base64)
-                    } else {
-                        ImageDecodeTestView(base64String: "")
-                    }
-                }
-
+                .padding()
+                .background(Color.blue)
+                .foregroundColor(.white)
+                .cornerRadius(8.0)
                 
             }
             .navigationTitle("Your Profile")
@@ -113,6 +104,15 @@ struct ProfileView: View {
         formatter.dateStyle = .medium
         formatter.timeStyle = .short
         return formatter.string(from: date)
+    }
+    private func sendProfileToStaff() {
+        do{
+            let payload = try Payload(type:.mobilityProfile,model: profile)
+            PeerConnectionManager.shared.send(payload: payload)
+            print("Sent User Mobility Profile")
+        } catch{
+            print("failed to send Mobility Profile: \(error)")
+        }
     }
     
 }

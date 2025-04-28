@@ -12,7 +12,6 @@ struct AssistiveApp: App {
             MenuItem.self,
             Order.self,
             Location.self,
-            Customer.self,
         ])
         let modelConfig = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
         do {

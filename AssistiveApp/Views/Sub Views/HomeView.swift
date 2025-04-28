@@ -49,7 +49,9 @@ struct HomeView: View {
                 )
 
                 do {
-                    _ = try Payload(type: .mobilityProfile, model: dummyProfile)
+                    let payload = try Payload(type: .mobilityProfile, model: dummyProfile)
+                    PeerConnectionManager.shared.send(payload: payload)
+
                     print("✅ Simulated MobilityProfile sent.")
                 } catch {
                     print("❌ Failed to simulate sending profile: \(error)")
