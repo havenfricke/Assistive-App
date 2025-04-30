@@ -18,7 +18,7 @@ struct MenuCategory: Codable {
     let items: [FoodItem]
 }
 
-struct FoodItem: Codable, Identifiable {
+struct FoodItem: Codable, Identifiable, Equatable, Hashable {
     var id: String {name}
     let name: String
     let description: String?

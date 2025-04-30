@@ -9,7 +9,6 @@ import SwiftData
 struct AssistiveApp: App {
     var sharedContainer: ModelContainer = {
         let schema = Schema([
-            MenuItem.self,
             Order.self,
             Location.self,
         ])

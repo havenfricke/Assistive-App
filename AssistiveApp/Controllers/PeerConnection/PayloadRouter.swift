@@ -16,6 +16,7 @@ class PayloadRouter
     var onReceiveAlertMessage: ((AlertMessage) -> Void)?
     var onReceiveDirections: ((RoutePath) -> Void)?
     var onReceiveDrawPath: (([CGPoint]) -> Void)?
+    var onReceivedOrder: ((Order) -> Void)?
 
     private init(){}
     
@@ -41,6 +42,10 @@ class PayloadRouter
                 if let points = try? payload.decode(as: [CGPoint].self){
                     onReceiveDrawPath?(points)
                 }
+            case .order:
+                if let order = try? payload.decode(as: Order.self){
+                    onReceivedOrder?(order)
+                }
                 
             }
         }
@@ -52,6 +57,7 @@ enum PayloadType: String, Codable{
     case alertMessage
     case sendDirections
     case drawPath
+    case order
 }
 
 struct Payload: Codable {

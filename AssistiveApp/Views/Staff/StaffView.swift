@@ -13,6 +13,10 @@ struct StaffView: View {
                     .tabItem { Label("Alerts", systemImage: "exclamationmark.bubble") }
                 CustomerInfoView(profileManager: mobilityProfileManager)
                     .tabItem { Label("Customer Info", systemImage: "person.circle") }
+                MenuBuilderView()
+                    .tabItem{Label("Menu Builder", systemImage: "list.bullet.rectangle")}
+                OrdersListView(orderManager: OrderManager())
+                    .tabItem{Label("Orders", systemImage: "cart.fill")}
 
             }
             .navigationTitle("Staff Dashboard")
@@ -114,4 +118,8 @@ class AlertManager: ObservableObject{
             }
         }
     }
+}
+
+#Preview {
+    StaffView()
 }
