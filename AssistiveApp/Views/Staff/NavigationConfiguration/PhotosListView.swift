@@ -60,8 +60,36 @@ struct PhotosListView: View {
                 }
                 .sheet(item: $formType) { $0 }
             }
+            .onAppear {
+                // Check if the samples list is empty and add initial samples if it is
+                if samples.isEmpty {
+                    addInitialSamples()
+                }
+            }
         }
     }
+    
+    //manually add initial samples from cafe if the list is empty
+    private func addInitialSamples() {
+            let initialSamples = [
+                SampleModel(name: "General Floor Plan", data: UIImage(named: "FloorPlan")?.pngData()),
+                SampleModel(name: "Restroooms", data: UIImage(named: "Restrooms")?.pngData()),
+                SampleModel(name: "Table1", data: UIImage(named: "Table1")?.pngData()),
+                SampleModel(name: "Table2", data: UIImage(named: "Table2")?.pngData()),
+                SampleModel(name: "Table3", data: UIImage(named: "Table3")?.pngData()),
+                SampleModel(name: "Table4", data: UIImage(named: "Table4")?.pngData()),
+                SampleModel(name: "Table5", data: UIImage(named: "Table5")?.pngData()),
+                SampleModel(name: "Table6", data: UIImage(named: "Table6")?.pngData()),
+                SampleModel(name: "Table7", data: UIImage(named: "Table7")?.pngData()),
+                SampleModel(name: "Table8", data: UIImage(named: "Table8")?.pngData()),
+                SampleModel(name: "Table9", data: UIImage(named: "Table9")?.pngData()),
+                SampleModel(name: "Table10", data: UIImage(named: "Table10")?.pngData())
+            ]
+            for sample in initialSamples {
+                modelContext.insert(sample)
+            }
+            try? modelContext.save()
+        }
 }
 
 #Preview {

@@ -43,9 +43,19 @@ extension SampleModel {
         
         var samples: [SampleModel] {
             [
-                .init(name: "Sample 1"),
-                .init(name: "Sample 2"),
-                .init(name: "Sample 3")
+                    .init(name: "General Floorplan", data: UIImage(named: "FloorPlan")?.pngData()),
+                    .init(name: "Restrooms", data: UIImage(named: "Restrooms")?.pngData()),
+                    .init(name: "Table1", data: UIImage(named: "Table1")?.pngData()),
+                    .init(name: "Table2", data: UIImage(named: "Table2")?.pngData()),
+                    .init(name: "Table3", data: UIImage(named: "Table3")?.pngData()),
+                    .init(name: "Table4", data: UIImage(named: "Table4")?.pngData()),
+                    .init(name: "Table5", data: UIImage(named: "Table5")?.pngData()),
+                    .init(name: "Table6", data: UIImage(named: "Table6")?.pngData()),
+                    .init(name: "Table7", data: UIImage(named: "Table7")?.pngData()),
+                    .init(name: "Table8", data: UIImage(named: "Table8")?.pngData()),
+                    .init(name: "Table9", data: UIImage(named: "Table9")?.pngData()),
+                    .init(name: "Table10", data: UIImage(named: "Table10")?.pngData()),
+                        
             ]
         }
         samples.forEach {

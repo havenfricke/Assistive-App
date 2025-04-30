@@ -5,6 +5,7 @@
 //  Created by Lukas Morawietz on 4/23/25.
 //
 import SwiftUI
+import SwiftData
 
 struct NavView: View {
     @State private var isZoomed: Bool = false
@@ -12,7 +13,7 @@ struct NavView: View {
     var body: some View {
         NavigationStack {
             VStack {
-                Text("Floor Plan")
+                Text("General Floor Plan")
                     .font(.title)
                 Image("FloorPlan")
                     .resizable()
@@ -124,3 +125,12 @@ struct NavView: View {
             NavView()
         }
     }
+
+    struct NavView_Previews2: PreviewProvider {
+        static var previews: some View {
+            HelpNavigationView()
+        }
+    }
+        
+
+
