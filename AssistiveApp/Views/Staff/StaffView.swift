@@ -5,7 +5,7 @@ import MultipeerConnectivity
 struct StaffView: View {
     @StateObject private var mobilityProfileManager = MobilityProfileManager()
     @StateObject private var alertManager = AlertManager()
-    @StateObject private var navManager = NavigationHelpRequestManager()
+//    @StateObject private var navManager = NavigationHelpRequestManager()
     
     var body: some View {
         NavigationView {
@@ -20,8 +20,8 @@ struct StaffView: View {
                     .tabItem{Label("Orders", systemImage: "cart.fill")}
                 NavigationAssetManagerView()
                     .tabItem{Label("Navigation Config", systemImage: "map.fill")}
-                LiveNavigationRequestsView(navRequestManager: navManager)
-                    .tabItem { Label("Nav Requests", systemImage: "arrowshape.turn.up.right") }
+                //LiveNavigationRequestsView(navRequestManager: navManager)
+                //    .tabItem { Label("Nav Requests", systemImage: "arrowshape.turn.up.right") }
 
 
             }
@@ -90,6 +90,7 @@ struct StaffView: View {
         } catch {
             print("❌ Failed to send initial MenuData payload: \(error)")
         }
+        
     }
 }
 

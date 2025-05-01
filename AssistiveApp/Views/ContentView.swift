@@ -7,6 +7,7 @@ import SwiftUI
 
 struct ContentView: View {
     @StateObject private var connectionManager = UserConnectionManager()
+    @StateObject private var navStore = NavigationAssetStore()
     let profile: MobilityProfile
     
     var body: some View {
@@ -37,3 +38,4 @@ class UserConnectionManager: ObservableObject {
         PeerConnectionManager.shared.isStaffMode = false
     }
 }
+

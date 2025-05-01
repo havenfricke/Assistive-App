@@ -7,6 +7,7 @@ import SwiftData
 
 @main
 struct AssistiveApp: App {
+    @StateObject private var navAssetStore = NavigationAssetStore()
     var sharedContainer: ModelContainer = {
         let schema = Schema([
             Order.self,
@@ -26,6 +27,7 @@ struct AssistiveApp: App {
     var body: some Scene {
         WindowGroup {
             AppRouterView()
+                .environmentObject(navAssetStore)
         }
         .modelContainer(sharedContainer)
     }

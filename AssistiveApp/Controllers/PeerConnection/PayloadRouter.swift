@@ -15,9 +15,9 @@ class PayloadRouter
     var onReceiveMenuData: ((MenuData) -> Void)?
     var onReceiveAlertMessage: ((AlertMessage) -> Void)?
     var onReceiveNavigationRequest: ((NavigationHelpRequest) -> Void)?
-    var onReceiveDirections: ((RoutePath) -> Void)?
     var onReceiveDrawPath: (([CGPoint]) -> Void)?
     var onReceivedOrder: ((Order) -> Void)?
+    var onReceivedNavigationData: ((NavigationDataPayload) -> Void)?
 
     private init(){}
     
@@ -49,6 +49,10 @@ class PayloadRouter
                     onReceiveNavigationRequest?(request)
                     
                 }
+            case .navigationData:
+                if let dataPayload = try? payload.decode(as: NavigationDataPayload.self){
+                    onReceivedNavigationData?(dataPayload)
+                }
             }
         }
     }
@@ -58,6 +62,7 @@ enum PayloadType: String, Codable{
     case menuData
     case alertMessage
     case navigationRequest
+    case navigationData
     case drawPath
     case order
 }

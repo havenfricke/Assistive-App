@@ -180,6 +180,12 @@ struct ARScannerTabView: View {
                     print("Peer Connected: \(peerID.displayName)")
                     self.sendMobilityProfile()
                 }
+                PayloadRouter.shared.onReceivedNavigationData = { payload in
+                    Task{
+                        @MainActor in
+                        NavigationAssetStore.shared.updatedAssets(payload.assets)
+                    }
+                }
 
                 DispatchQueue.main.asyncAfter(deadline: .now() + 5) { [weak self] in
                     guard let self = self else { return }

@@ -49,6 +49,16 @@ extension NavModel {
     }
 }
 
+extension NavModel{
+    func toDTO() -> NavigationAssetDTO{
+        return NavigationAssetDTO(
+            name: self.name,
+            category: self.category,
+            imageData: self.data
+        )
+    }
+}
+
 enum LocationCategory: String, CaseIterable, Identifiable, Codable {
     case restroom
     case table
@@ -67,49 +77,3 @@ enum LocationCategory: String, CaseIterable, Identifiable, Codable {
     }
 }
 
-enum NavigationRequestType: String, CaseIterable, Identifiable{
-    case table
-    case restroom
-    case customerStation
-    
-    var id: String { rawValue }
-    
-    var label:String {
-        switch self{
-        case .table: return "Display Table Location"
-        case .restroom: return "Display Restroom Location"
-        case .customerStation: return "Customer Station"
-        }
-    }
-    var systemImage: String{
-        switch self{
-        case .table: return "chair"
-        case .restroom: return "figure.walk"
-        case .customerStation: return "wrench"
-        }
-    }
-    var categoryMatch: LocationCategory{
-        switch self{
-        case .table: return .table
-        case .restroom: return .restroom
-        case .customerStation: return .customerStation
-        }
-    }
-}
-
-struct NavigationHelpRequest: Codable{
-    let requestType: String
-    let targetName: String
-}
-
-class NavigationHelpRequestManager: ObservableObject {
-    @Published var receivedRequests: [NavigationHelpRequest] = []
-
-    init() {
-        PayloadRouter.shared.onReceiveNavigationRequest = { [weak self] request in
-            DispatchQueue.main.async {
-                self?.receivedRequests.append(request)
-            }
-        }
-    }
-}

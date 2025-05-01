@@ -98,10 +98,6 @@ struct PayloadTestView: View {
             logMessages.append("✅ Menu for \(menu.locationName) with \(menu.categories.count) categories")
         }
 
-        PayloadRouter.shared.onReceiveDirections = { route in
-            logMessages.append("✅ Route to \(route.destinationLabel ?? "unknown") with \(route.points.count) points")
-        }
-
         PayloadRouter.shared.onReceiveAlertMessage = { alert in
             logMessages.append("🆘 Help requested")
         }

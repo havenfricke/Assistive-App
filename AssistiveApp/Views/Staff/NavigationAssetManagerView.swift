@@ -35,9 +35,16 @@ struct NavigationAssetManagerView: View {
                 }
 
                 Section {
-                    Button("Generate & Send Navigation Assets") {
-                        // Placeholder for future Multipeer payload trigger
-                        print("🚧 Sending navigation assets not yet implemented")
+                    Button("Send Navigation Data") {
+                        do{
+                            let dtoList = samples.map {$0.toDTO() }
+                            let payload = NavigationDataPayload(assets:dtoList)
+                            let wrappedPayload = try Payload(type:.navigationData, model:payload)
+                            PeerConnectionManager.shared.send(payload:wrappedPayload)
+                            print("Navigation data payload sent with \(dtoList.count) assets")
+                        } catch {
+                            print("Failed to send navigation data payload: \(error)")
+                        }
                     }
                 }
             }

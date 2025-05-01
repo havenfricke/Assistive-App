@@ -25,6 +25,7 @@ struct HomeView: View {
             .padding()
             .navigationTitle("Home")
         }
+        
     }
     
     private func simulateSendingProfile(){
