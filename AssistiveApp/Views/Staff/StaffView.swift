@@ -5,6 +5,7 @@ import MultipeerConnectivity
 struct StaffView: View {
     @StateObject private var mobilityProfileManager = MobilityProfileManager()
     @StateObject private var alertManager = AlertManager()
+    @StateObject private var navManager = NavigationHelpRequestManager()
     
     var body: some View {
         NavigationView {
@@ -17,6 +18,11 @@ struct StaffView: View {
                     .tabItem{Label("Menu Builder", systemImage: "list.bullet.rectangle")}
                 OrdersListView(orderManager: OrderManager())
                     .tabItem{Label("Orders", systemImage: "cart.fill")}
+                NavigationAssetManagerView()
+                    .tabItem{Label("Navigation Config", systemImage: "map.fill")}
+                LiveNavigationRequestsView(navRequestManager: navManager)
+                    .tabItem { Label("Nav Requests", systemImage: "arrowshape.turn.up.right") }
+
 
             }
             .navigationTitle("Staff Dashboard")

@@ -52,10 +52,11 @@ struct LocationSection: View{
 struct CategoriesTabView: View {
     @ObservedObject var viewModel: MenuBuilderViewModel
     @State private var selectedIndex: Int = 0
+    @State private var selectedItem: EditableFoodItem?  // 🔼 LIFTED UP
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            // MARK: - Custom Tab Bar
+            // Custom Tab Bar (unchanged)
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 12) {
                     ForEach(viewModel.categories.indices, id: \.self) { index in
@@ -72,11 +73,11 @@ struct CategoriesTabView: View {
                         }
                     }
 
-                    // Add Category Button
                     Button(action: {
                         viewModel.addCategory()
                         selectedIndex = viewModel.categories.count - 1
-                    }) {Text("Add Category")
+                    }) {
+                        Text("Add Category")
                         Image(systemName: "plus.circle.fill")
                             .font(.title2)
                             .foregroundColor(.blue)
@@ -85,32 +86,37 @@ struct CategoriesTabView: View {
                 .padding(.horizontal)
             }
 
-            // MARK: - Selected Category Editor
+            // Category Editor
             if viewModel.categories.indices.contains(selectedIndex) {
-                CategoryEditor(categoryBinding: $viewModel.categories[selectedIndex])
-                    .padding(.horizontal)
+                CategoryEditor(
+                    categoryBinding: $viewModel.categories[selectedIndex],
+                    selectedItem: $selectedItem   // 🔽 PASSED DOWN
+                )
+                .padding(.horizontal)
             } else {
                 Text("No categories yet.")
                     .foregroundColor(.secondary)
                     .padding()
             }
         }
+        // ✅ FIX: Apply navigationDestination here (outside Lazy container)
+        .navigationDestination(item: $selectedItem) { item in
+            ItemEditorView(item: item, categoryBinding: $viewModel.categories[selectedIndex])
+        }
     }
 }
-import SwiftUI
+
 
 struct CategoryEditor: View {
     @Binding var categoryBinding: EditableCategory
-    @State private var selectedItem: EditableFoodItem?
+    @Binding var selectedItem: EditableFoodItem?  // 🔼 Comes from parent
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            // Editable category name field
             TextField("Category Name", text: $categoryBinding.name)
                 .textFieldStyle(.roundedBorder)
                 .padding(.bottom, 8)
 
-            // Item list
             ForEach(categoryBinding.items) { item in
                 Button {
                     selectedItem = item
@@ -122,47 +128,31 @@ struct CategoryEditor: View {
                         .background(Color(.systemGray5))
                         .cornerRadius(8)
                 }
-                .buttonStyle(PlainButtonStyle()) // Prevents default blue button highlight
+                .buttonStyle(.plain)
             }
 
-
+            Button(action: {
+                let newItem = EditableFoodItem(
+                    name: "",
+                    description: nil,
+                    price: 0.0,
+                    allergens: [],
+                    imageURL: nil
+                )
+                categoryBinding.items.append(newItem)
+                selectedItem = newItem
+            }) {
+                Label("Add Item", systemImage: "plus.circle.fill")
+                    .font(.headline)
+            }
+            .padding(.top)
         }
         .padding()
         .background(Color(.systemGray6))
         .cornerRadius(12)
-        .overlay(
-            // Invisible link that triggers actual navigation
-            NavigationLink(value: selectedItem) {
-                EmptyView()
-            }
-            .hidden()
-            .frame(width: 0, height: 0)
-            .disabled(selectedItem == nil)
-            .allowsHitTesting(false)
-            .accessibilityHidden(true)
-        )
-        .navigationDestination(item: $selectedItem) { item in
-            ItemEditorView(item: item, categoryBinding: $categoryBinding)
-        }
-        // Add Item Button
-        Button(action: {
-            let newItem = EditableFoodItem(
-                name: "",
-                description: nil,
-                price: 0.0,
-                allergens: [],
-                imageURL: nil
-            )
-            categoryBinding.items.append(newItem)
-            selectedItem = newItem
-        }) {
-            Label("Add Item", systemImage: "plus.circle.fill")
-                .font(.headline)
-        }
-        .padding(.top)
-
     }
 }
+
 
 struct ItemEditorView: View{
     var item: EditableFoodItem

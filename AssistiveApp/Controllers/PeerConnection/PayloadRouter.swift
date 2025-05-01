@@ -14,6 +14,7 @@ class PayloadRouter
     var onReceiveMobilityProfile: ((MobilityProfile) -> Void)?
     var onReceiveMenuData: ((MenuData) -> Void)?
     var onReceiveAlertMessage: ((AlertMessage) -> Void)?
+    var onReceiveNavigationRequest: ((NavigationHelpRequest) -> Void)?
     var onReceiveDirections: ((RoutePath) -> Void)?
     var onReceiveDrawPath: (([CGPoint]) -> Void)?
     var onReceivedOrder: ((Order) -> Void)?
@@ -34,10 +35,6 @@ class PayloadRouter
                 if let alert = try? payload.decode(as: AlertMessage.self){
                     onReceiveAlertMessage?(alert)
                 }
-            case .sendDirections:
-                if let directions = try? payload.decode(as: RoutePath.self){
-                    onReceiveDirections?(directions)
-                }
             case .drawPath:
                 if let points = try? payload.decode(as: [CGPoint].self){
                     onReceiveDrawPath?(points)
@@ -46,7 +43,12 @@ class PayloadRouter
                 if let order = try? payload.decode(as: Order.self){
                     onReceivedOrder?(order)
                 }
-                
+            case .navigationRequest:
+                if let request = try? payload.decode(as: NavigationHelpRequest.self){
+                    print("Navigation Help Request Received: \(request)")
+                    onReceiveNavigationRequest?(request)
+                    
+                }
             }
         }
     }
@@ -55,7 +57,7 @@ enum PayloadType: String, Codable{
     case mobilityProfile
     case menuData
     case alertMessage
-    case sendDirections
+    case navigationRequest
     case drawPath
     case order
 }

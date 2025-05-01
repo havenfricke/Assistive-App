@@ -18,9 +18,6 @@ struct HomeView: View {
                 Text("Navigate, scan & order with ease.")
                     .foregroundColor(.secondary)
                 
-                Button("Configure Peer Connection"){
-                    configurePeerConnection()
-                }
                 Button("Simulate Send Profile"){
                     simulateSendingProfile()
                 }
@@ -30,12 +27,6 @@ struct HomeView: View {
         }
     }
     
-    private func configurePeerConnection(){
-        let peerManager = PeerConnectionManager.shared
-        peerManager.isStaffMode = false
-        peerManager.start()
-        
-    }
     private func simulateSendingProfile(){
         let dummyProfile = MobilityProfile(
                     name: "Simulated User",

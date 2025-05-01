@@ -12,7 +12,6 @@ struct PayloadTestView: View {
             Group {
                 Button("Send Test MobilityProfile", action: simulateMobilityProfile)
                 Button("Send Test MenuData", action: simulateMenuData)
-                Button("Send Test RoutePath", action: simulateRoutePath)
                 Button("Send Help Request", action: simulateHelpRequest)
                 Button("Send DrawPath", action: simulateDrawPath)
             }
@@ -48,11 +47,6 @@ struct PayloadTestView: View {
         ]
         let menu = MenuData(locationID: "test123", locationName: "Demo Café", categories: [MenuCategory(name: "Main", items: items)])
         sendPayload(.menuData, model: menu)
-    }
-
-    private func simulateRoutePath() {
-        let route = RoutePath(points: [CGPoint(x: 10, y: 10), CGPoint(x: 20, y: 20)], destinationLabel: "Table 7")
-        sendPayload(.sendDirections, model: route)
     }
 
     private func simulateHelpRequest() {

@@ -11,6 +11,9 @@ struct AssistiveApp: App {
         let schema = Schema([
             Order.self,
             Location.self,
+            NavModel.self,
+            MobilityProfile.self
+            
         ])
         let modelConfig = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
         do {
