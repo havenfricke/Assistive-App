@@ -24,5 +24,6 @@ struct ContentView: View {
 
 #Preview {
     ContentView()
-        .modelContainer(for: [MenuItem.self, Order.self, Location.self], inMemory: true)
+        .modelContainer(for: [Order.self, Location.self], inMemory: true)
+        .environmentObject(OrderManager())
 }

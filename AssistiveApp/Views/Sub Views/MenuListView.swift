@@ -1,38 +1,39 @@
-//
-//  MenuListView.swift
-//  AssistiveApp
-//
-//  Created by Haven F on 4/7/25.
-//
-
-
 import SwiftUI
 import SwiftData
 
 struct MenuListView: View {
-    // SwiftData query to fetch MenuItem models.
-    @Query private var menuItems: [MenuItem]
     @State private var selectedMenuItem: MenuItem?
-    // Added states for allergen filtering
     @State private var selectedAllergens: [String] = []
     @State private var filterStrategy: AllergenFilterStrategy = DefaultAllergenFilter()
-    // Hard coded test data
-    @State private var localMenuItems: [MenuItem] = [
-        MenuItem(name: "Burger", descriptor: "Beef with cheese", price: 9.99, imageName: "burger", allergens: ["Dairy", "Gluten"], accessibilityInfo: "Cut into quarters"),
-        MenuItem(name: "Salad", descriptor: "Fresh garden salad", price: 6.49, imageName: "salad", allergens: ["Soy"], accessibilityInfo: "Dressing on side"),
-        MenuItem(name: "Fries", descriptor: "Crispy fries", price: 3.99, imageName: "fries", allergens: nil, accessibilityInfo: nil)
+
+    @State private var menuItems: [MenuItem] = [
+        MenuItem(name: "Burger", description: "Beef with cheese", price: 9.99,
+                 allergens: ["Dairy", "Gluten"], imageURL: "burger", accessibilityInfo: "Cut into quarters",
+                 ingredients: ["Bun", "Beef Patty", "Cheese", "Lettuce", "Tomato"]),
+        MenuItem(name: "Salad", description: "Fresh garden salad", price: 6.49,
+                 allergens: ["Soy"], imageURL: "salad", accessibilityInfo: "Dressing on side",
+                 ingredients: ["Lettuce", "Tomato", "Cucumber", "Soy Dressing"]),
+        MenuItem(name: "Fries", description: "Crispy fries", price: 3.99,
+                 allergens: [], imageURL: "fries", accessibilityInfo: nil,
+                 ingredients: ["Salt"])
     ]
 
-    // Calls localMenuItems instead of menuItems for testing
-    var filteredItems: [MenuItem] {
-        filterStrategy.filter(menuItems: localMenuItems, allergens: selectedAllergens)
-    }
+    @State private var showAddToOrderPopup = false
+    @State private var quantity = 1
+    @State private var itemToAdd: MenuItem? = nil
+    @State private var selectedIngredients: [String] = []
 
+    @EnvironmentObject var orderManager: OrderManager
+
+    var filteredItems: [MenuItem] {
+        filterStrategy.filter(menuItems: menuItems, allergens: selectedAllergens)
+    }
 
     var body: some View {
         NavigationView {
             VStack(alignment: .leading) {
                 Spacer().frame(height: 20)
+
                 Text("Filter by Allergens")
                     .font(.headline)
                     .padding(.horizontal)
@@ -57,15 +58,20 @@ struct MenuListView: View {
                     }
                     .padding(.horizontal)
                 }
-                
 
-                List(selection: $selectedMenuItem) {
-                    ForEach(filteredItems) { item in
-                        NavigationLink(value: item) {
+                List {
+                    ForEach(filteredItems, id: \.name) { item in
+                        Button {
+                            itemToAdd = item
+                            quantity = 1
+                            selectedIngredients = item.ingredients
+                        } label: {
                             MenuItemRow(item: item)
                         }
+                        .buttonStyle(PlainButtonStyle())
                     }
                 }
+
                 Spacer()
             }
             .padding(.top)
@@ -78,6 +84,80 @@ struct MenuListView: View {
                 }
             }
         }
+        .sheet(item: $itemToAdd) { item in
+            VStack(spacing: 20) {
+                if let image = item.imageURL {
+                    Image(image)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(height: 150)
+                        .cornerRadius(12)
+                        .padding(.top)
+                }
+
+                Text("Add \(item.name)")
+                    .font(.title2)
+
+                Stepper("Quantity: \(quantity)", value: $quantity, in: 1...99)
+                    .padding()
+
+                Text("Edit Ingredients")
+                    .font(.headline)
+                ScrollView {
+                    VStack(alignment: .leading) {
+                        ForEach(item.ingredients, id: \.self) { ingredient in
+                            Toggle(isOn: Binding(
+                                get: { selectedIngredients.contains(ingredient) },
+                                set: { isSelected in
+                                    if isSelected {
+                                        selectedIngredients.append(ingredient)
+                                    } else {
+                                        selectedIngredients.removeAll { $0 == ingredient }
+                                    }
+                                }
+                            )) {
+                                Text(ingredient)
+                            }
+                        }
+                    }
+                    .padding(.horizontal)
+                }
+
+                Button("Add to Order") {
+                    var customItem = item
+                    customItem.ingredients = selectedIngredients
+
+                    // Look for an existing order with the same item name + ingredients
+                    if let index = orderManager.selectedItems.firstIndex(where: {
+                        $0.menuItem.name == customItem.name &&
+                        $0.menuItem.ingredients.sorted() == customItem.ingredients.sorted()
+                    }) {
+                        // Stack: increase quantity
+                        orderManager.selectedItems[index].quantity += quantity
+                    } else {
+                        // Add new stack
+                        let newOrderItem = OrderItem(
+                            menuItem: customItem,
+                            quantity: quantity,
+                            originalIngredients: item.ingredients
+                        )
+                        orderManager.selectedItems.append(newOrderItem)
+                    }
+
+                    itemToAdd = nil
+                }
+                .padding()
+                .background(Color.blue)
+                .foregroundColor(.white)
+                .cornerRadius(8)
+
+                Button("Cancel") {
+                    itemToAdd = nil
+                }
+                .padding(.top, 10)
+            }
+            .padding()
+        }
     }
 }
 
@@ -86,8 +166,8 @@ struct MenuItemRow: View {
 
     var body: some View {
         HStack {
-            if let imageName = item.imageName {
-                Image(imageName)
+            if let imageURL = item.imageURL {
+                Image(imageURL)
                     .resizable()
                     .scaledToFit()
                     .frame(width: 60, height: 60)
@@ -101,8 +181,8 @@ struct MenuItemRow: View {
                 Text(item.name)
                     .font(.headline)
 
-                if let descriptor = item.descriptor {
-                    Text(descriptor)
+                if let description = item.description {
+                    Text(description)
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                 }
@@ -110,8 +190,8 @@ struct MenuItemRow: View {
                 Text(String(format: "$%.2f", item.price))
                     .font(.subheadline)
 
-                if let allergens = item.allergens, !allergens.isEmpty {
-                    Text("Contains: \(allergens.joined(separator: ", "))")
+                if !item.allergens.isEmpty {
+                    Text("Contains: \(item.allergens.joined(separator: ", "))")
                         .font(.caption)
                         .foregroundColor(.red)
                 }
@@ -126,4 +206,3 @@ struct MenuItemRow: View {
         .padding(.vertical, 6)
     }
 }
-
