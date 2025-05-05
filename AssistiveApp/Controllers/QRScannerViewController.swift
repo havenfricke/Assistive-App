@@ -1,3 +1,11 @@
+//
+//  QRScannerViewController.swift
+//  AssistiveApp
+//
+//  Created by Haven F on 5/2/25.
+//
+
+
 import SwiftUI
 import SwiftData
 import AVFoundation

@@ -1,3 +1,11 @@
+//
+//  ScannerViewControllerWrapper.swift
+//  AssistiveApp
+//
+//  Created by Haven F on 5/2/25.
+//
+
+
 import AVFoundation
 import SwiftUI
 

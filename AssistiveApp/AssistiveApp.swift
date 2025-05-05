@@ -13,8 +13,8 @@ struct AssistiveApp: App {
             Order.self,
             Location.self,
             NavModel.self,
-            MobilityProfile.self
-            
+            MobilityProfile.self,
+            AccessPoint.self
         ])
         let modelConfig = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
         do {

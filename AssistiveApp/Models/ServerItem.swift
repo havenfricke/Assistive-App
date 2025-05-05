@@ -1,6 +1,6 @@
 //
 //  ServerItem.swift
-//  URLQRCode
+//  AssistiveApp
 //
 //  Created by Haven F on 5/2/25.
 //
