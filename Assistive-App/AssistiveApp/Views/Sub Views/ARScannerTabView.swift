@@ -16,12 +16,10 @@ struct ARScannerTabView: View {
                 ForEach(accessPoints) { point in
                     NavigationLink {
                         VStack(alignment: .leading, spacing: 12) {
-                            if let value = point.scannedValue {
-                                Text(value)
-                                    .font(.title3)
-                                    .bold()
-                            }
-                            Text("Scanned at: \(point.timestamp.formatted(date: .numeric, time: .standard))")
+                            Text(point.desc)
+                                .font(.title3)
+                                .bold()
+                            Text("Scanned at: \(point.netID)")
                                 .font(.footnote)
                                 .foregroundColor(.secondary)
                             Spacer()
@@ -29,11 +27,9 @@ struct ARScannerTabView: View {
                         .padding()
                     } label: {
                         VStack(alignment: .leading) {
-                            if let value = point.scannedValue {
-                                Text(value)
-                                    .font(.headline)
-                            }
-                            Text(point.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))
+                            Text(point.desc)
+                                .font(.headline)
+                            Text(point.netID)
                                 .font(.caption)
                                 .foregroundColor(.gray)
                         }
@@ -97,7 +93,10 @@ struct ARScannerTabView: View {
 
     private func addItem() {
         withAnimation {
-            let newItem = AccessPoint(timestamp: Date(), scannedValue: "Manually added item")
+            let newItem = AccessPoint(
+                netID: Date().formatted(date: .numeric, time: .standard),
+                desc: "Manually added item"
+            )
             modelContext.insert(newItem)
         }
     }
@@ -123,11 +122,14 @@ struct ARScannerTabView: View {
                 if let item = try? JSONDecoder().decode(ServerItem.self, from: data) {
                     DispatchQueue.main.async {
                         withAnimation {
-                            let combinedText = "\(item.title): \(item.description)"
-                            let newItem = AccessPoint(timestamp: Date(), scannedValue: combinedText)
+                            let combinedText = "\(item.netID): \(item.desc)"
+                            let newItem = AccessPoint(
+                                netID: Date().formatted(date: .numeric, time: .standard),
+                                desc: combinedText
+                            )
                             modelContext.insert(newItem)
                         }
-                        performHighConfidenceAction(identifier: item.title)
+                        performHighConfidenceAction(identifier: item.netID)
                     }
                 } else {
                     print("Decoding failed")
