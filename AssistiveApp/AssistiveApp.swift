@@ -7,13 +7,14 @@ import SwiftData
 
 @main
 struct AssistiveApp: App {
+    @StateObject private var navAssetStore = NavigationAssetStore()
     var sharedContainer: ModelContainer = {
         let schema = Schema([
-            MenuItem.self,
             Order.self,
             Location.self,
-            Customer.self,
-            LocationTag.self
+            NavModel.self,
+            MobilityProfile.self,
+            AccessPoint.self
         ])
         let modelConfig = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
         do {
@@ -25,7 +26,8 @@ struct AssistiveApp: App {
     
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            AppRouterView()
+                .environmentObject(navAssetStore)
         }
         .modelContainer(sharedContainer)
     }

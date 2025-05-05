@@ -1,120 +1,172 @@
 import SwiftUI
-import ARKit
-import SceneKit
-import Vision
-import CoreML
+import SwiftData
 
 struct ARScannerTabView: View {
+    let profile: MobilityProfile
+
+    @Environment(\.modelContext) private var modelContext
+    @Query private var accessPoints: [AccessPoint]
+
+    @State private var showRetryPrompt = false
+    @State private var showScanner = false
+
     var body: some View {
-        NavigationStack {
-            ARScannerViewWrapper()
+        NavigationSplitView {
+            List {
+                ForEach(accessPoints) { point in
+                    NavigationLink {
+                        VStack(alignment: .leading, spacing: 12) {
+                            if let value = point.scannedValue {
+                                Text(value)
+                                    .font(.title3)
+                                    .bold()
+                            }
+                            Text("Scanned at: \(point.timestamp.formatted(date: .numeric, time: .standard))")
+                                .font(.footnote)
+                                .foregroundColor(.secondary)
+                            Spacer()
+                        }
+                        .padding()
+                    } label: {
+                        VStack(alignment: .leading) {
+                            if let value = point.scannedValue {
+                                Text(value)
+                                    .font(.headline)
+                            }
+                            Text(point.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))
+                                .font(.caption)
+                                .foregroundColor(.gray)
+                        }
+                    }
+                }
+                .onDelete(perform: deleteItems)
+            }
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    EditButton()
+                }
+                ToolbarItem {
+                    Button(action: addItem) {
+                        Label("Add Item", systemImage: "plus")
+                    }
+                }
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button(action: {
+                        showScanner.toggle()
+                    }) {
+                        Label("Scan", systemImage: "qrcode.viewfinder")
+                    }
+                }
+            }
+            .sheet(isPresented: $showScanner) {
+                ScannerViewControllerWrapper { scannedValue in
+                    handleScan(value: scannedValue)
+                    showScanner = false
+                }
                 .ignoresSafeArea()
-                .navigationTitle("AR Scanner")
-        }
-    }
-}
-
-struct ARScannerViewWrapper: UIViewRepresentable {
-    func makeCoordinator() -> Coordinator {
-        Coordinator()
-    }
-
-    func makeUIView(context: Context) -> ARSCNView {
-        let sceneView = ARSCNView()
-        sceneView.delegate = context.coordinator
-        sceneView.session.delegate = context.coordinator // Get AR frames
-
-        let configuration = ARWorldTrackingConfiguration()
-        configuration.planeDetection = [.horizontal]
-        sceneView.session.run(configuration)
-        sceneView.autoenablesDefaultLighting = true
-
-        return sceneView
-    }
-
-    func updateUIView(_ uiView: ARSCNView, context: Context) {}
-
-    static func dismantleUIView(_ uiView: ARSCNView, coordinator: Coordinator) {
-        uiView.session.pause()
-    }
-
-    class Coordinator: NSObject, ARSCNViewDelegate, ARSessionDelegate {
-        let visionModel: VNCoreMLModel
-        var request: VNCoreMLRequest?
-        let requestHandlerQueue = DispatchQueue(label: "com.model.inference")
-
-        var confidenceAboveThresholdFrames = 0
-        let confidenceThreshold: Float = 0.95
-        let requiredFrameCount = 5
-        var hasTriggeredAction = false
-
-        override init() {
-            guard let mlModel = try? AccessibilityRecognitionModel(configuration: MLModelConfiguration()).model,
-                  let vnModel = try? VNCoreMLModel(for: mlModel) else {
-                fatalError("Could not load AccessibilityRecognitionModel")
             }
+        } detail: {
+            ZStack {
+                Text("Select an item")
+                    .font(.title3)
+                    .foregroundColor(.secondary)
 
-            self.visionModel = vnModel
-            super.init()
-            self.setupRequest()
-        }
-
-        private func setupRequest() {
-            self.request = VNCoreMLRequest(model: visionModel) { request, error in
-                guard let results = request.results as? [VNClassificationObservation],
-                      let topResult = results.first else {
-                    print("No results from Vision")
-                    self.confidenceAboveThresholdFrames = 0
-                    self.hasTriggeredAction = false
-                    return
-                }
-
-                DispatchQueue.main.async {
-                    print("Recognized Symbol: \(topResult.identifier) – Confidence: \(topResult.confidence)")
-
-                    if topResult.confidence > self.confidenceThreshold {
-                        self.confidenceAboveThresholdFrames += 1
-                    } else {
-                        self.confidenceAboveThresholdFrames = 0
-                        self.hasTriggeredAction = false
+                if showRetryPrompt {
+                    VStack {
+                        Text("No staff device found.")
+                            .font(.headline)
+                            .padding()
+                        Button("Retry") {
+                            showRetryPrompt = false
+                            PeerConnectionManager.shared.start()
+                        }
+                        .padding()
+                        .background(Color.blue)
+                        .foregroundColor(.white)
+                        .cornerRadius(10)
                     }
-
-                    if self.confidenceAboveThresholdFrames >= self.requiredFrameCount && !self.hasTriggeredAction {
-                        self.hasTriggeredAction = true
-                        self.performHighConfidenceAction(identifier: topResult.identifier)
-                    }
-                }
-            }
-
-            self.request?.imageCropAndScaleOption = .centerCrop
-        }
-
-        private func performHighConfidenceAction(identifier: String) {
-            // Additional logic based on recognition here.
-            print("ACTION TRIGGERED: \(identifier)")
-            // e.g., navigate to another view, play audio, etc.
-        }
-
-        func renderer(_ renderer: SCNSceneRenderer, updateAtTime time: TimeInterval) {
-            guard let sceneView = renderer as? ARSCNView,
-                  let frame = sceneView.session.currentFrame else { return }
-
-            let pixelBuffer = frame.capturedImage
-            self.performVisionRequest(pixelBuffer: pixelBuffer)
-        }
-
-        private func performVisionRequest(pixelBuffer: CVPixelBuffer) {
-            guard let request = self.request else { return }
-
-            requestHandlerQueue.async {
-                let handler = VNImageRequestHandler(cvPixelBuffer: pixelBuffer, options: [:])
-                do {
-                    try handler.perform([request])
-                } catch {
-                    print("Vision error: \(error)")
+                    .background(Color.black.opacity(0.7))
+                    .cornerRadius(16)
+                    .padding()
                 }
             }
         }
     }
 
+    // MARK: - Item Actions
+
+    private func addItem() {
+        withAnimation {
+            let newItem = AccessPoint(timestamp: Date(), scannedValue: "Manually added item")
+            modelContext.insert(newItem)
+        }
+    }
+
+    private func deleteItems(offsets: IndexSet) {
+        withAnimation {
+            for index in offsets {
+                modelContext.delete(accessPoints[index])
+            }
+        }
+    }
+
+    // MARK: - Handle Scan + Networking
+
+    private func handleScan(value: String) {
+        guard let url = URL(string: value) else {
+            print("Invalid URL in scanned QR")
+            return
+        }
+
+        URLSession.shared.dataTask(with: url) { data, response, error in
+            if let data = data {
+                if let item = try? JSONDecoder().decode(ServerItem.self, from: data) {
+                    DispatchQueue.main.async {
+                        withAnimation {
+                            let combinedText = "\(item.title): \(item.description)"
+                            let newItem = AccessPoint(timestamp: Date(), scannedValue: combinedText)
+                            modelContext.insert(newItem)
+                        }
+                        performHighConfidenceAction(identifier: item.title)
+                    }
+                } else {
+                    print("Decoding failed")
+                }
+            } else if let error = error {
+                print("Network error: \(error)")
+            }
+        }.resume()
+    }
+
+    private func performHighConfidenceAction(identifier: String) {
+        print("ACTION TRIGGERED FROM QR: \(identifier)")
+        let peerConnectionManager = PeerConnectionManager.shared
+        peerConnectionManager.isStaffMode = false
+
+        peerConnectionManager.onPeerConnected = { peerID in
+            print("Peer Connected: \(peerID.displayName)")
+            sendMobilityProfile()
+        }
+
+        PayloadRouter.shared.onReceivedNavigationData = { payload in
+            Task { @MainActor in
+                NavigationAssetStore.shared.updatedAssets(payload.assets)
+            }
+        }
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
+            if !peerConnectionManager.hasConnectedPeers {
+                showRetryPrompt = true
+            }
+        }
+    }
+
+    private func sendMobilityProfile() {
+        do {
+            let payload = try Payload(type: .mobilityProfile, model: profile)
+            PeerConnectionManager.shared.send(payload: payload)
+        } catch {
+            print("Failed to send mobility profile: \(error)")
+        }
+    }
 }
