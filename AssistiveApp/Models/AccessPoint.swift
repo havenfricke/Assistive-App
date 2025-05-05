@@ -12,12 +12,13 @@ import SwiftData
 @Model
 class AccessPoint: Identifiable {
     var id: UUID
-    var timestamp: Date
-    var scannedValue: String?
+    var netID: String
+    var desc: String
 
-    init(id: UUID = UUID(), timestamp: Date, scannedValue: String? = nil) {
+    init(id: UUID = UUID(), netID: String, desc: String) {
         self.id = id
-        self.timestamp = timestamp
-        self.scannedValue = scannedValue
+        self.netID = netID
+        self.desc = desc
     }
 }
+
