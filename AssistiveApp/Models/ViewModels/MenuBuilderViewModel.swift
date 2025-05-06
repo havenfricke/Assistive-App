@@ -45,7 +45,8 @@ class MenuBuilderViewModel: ObservableObject {
                     description: $0.description,
                     price: $0.price,
                     allergens: $0.allergens,
-                    imageURL: $0.imageURL
+                    imageURL: $0.imageURL,
+                    accessibilityInfo: $0.accessibilityInfo
                 )
             }
         )
@@ -67,4 +68,5 @@ struct EditableFoodItem: Identifiable, Hashable {
     var price: Double
     var allergens: [String]
     var imageURL: String?
+    var accessibilityInfo: String?
 }

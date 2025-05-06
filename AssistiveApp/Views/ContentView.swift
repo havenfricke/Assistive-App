@@ -16,7 +16,7 @@ struct ContentView: View {
                 .tabItem { Label("Home", systemImage: "house") }
             ARScannerTabView(profile:profile)
                 .tabItem { Label("Scan", systemImage: "qrcode.viewfinder") }
-            MenuListView(viewModel: MenuViewModel())
+            MenuListView()
                 .tabItem { Label("Menu", systemImage: "menucard") }
             OrderView()
                 .tabItem { Label("Order", systemImage: "cart") }
@@ -27,9 +27,7 @@ struct ContentView: View {
     }
 }
 
-#Preview {
-    ContentView(profile: MobilityProfile())
-}
+
 
 @MainActor
 class UserConnectionManager: ObservableObject {
@@ -39,3 +37,6 @@ class UserConnectionManager: ObservableObject {
     }
 }
 
+#Preview {
+    ContentView(profile:MobilityProfile())
+}

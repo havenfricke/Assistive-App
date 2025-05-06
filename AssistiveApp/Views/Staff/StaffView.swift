@@ -54,14 +54,14 @@ struct StaffView: View {
                         description: "A juicy beef burger with lettuce and tomato.",
                         price: 9.99,
                         allergens: ["Gluten", "Dairy"],
-                        imageURL: nil
+                        imageURL: nil, accessibilityInfo: nil
                     ),
                     FoodItem(
                         name: "Grilled Chicken Sandwich",
                         description: "Grilled chicken breast on a toasted bun.",
                         price: 8.49,
                         allergens: ["Gluten"],
-                        imageURL: nil
+                        imageURL: nil, accessibilityInfo: nil
                     )
                 ]),
                 MenuCategory(name: "Drinks", items: [
@@ -70,14 +70,14 @@ struct StaffView: View {
                         description: "Cold brew coffee served over ice.",
                         price: 3.99,
                         allergens: [],
-                        imageURL: nil
+                        imageURL: nil, accessibilityInfo: nil
                     ),
                     FoodItem(
                         name: "Fresh Orange Juice",
                         description: "Fresh-squeezed orange juice.",
                         price: 4.49,
                         allergens: [],
-                        imageURL: nil
+                        imageURL: nil, accessibilityInfo: nil
                     )
                 ])
             ]

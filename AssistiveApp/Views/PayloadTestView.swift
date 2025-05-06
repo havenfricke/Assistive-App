@@ -42,8 +42,8 @@ struct PayloadTestView: View {
 
     private func simulateMenuData() {
         let items = [
-            FoodItem(name: "Veggie Burger", description: "With avocado", price: 9.99, allergens: ["Gluten"], imageURL: nil),
-            FoodItem(name: "Salad", description: "Mixed greens", price: 5.50, allergens: [], imageURL: nil)
+            FoodItem(name: "Veggie Burger", description: "With avocado", price: 9.99, allergens: ["Gluten"], imageURL: nil, accessibilityInfo: nil),
+            FoodItem(name: "Salad", description: "Mixed greens", price: 5.50, allergens: [], imageURL: nil, accessibilityInfo: nil)
         ]
         let menu = MenuData(locationID: "test123", locationName: "Demo Café", categories: [MenuCategory(name: "Main", items: items)])
         sendPayload(.menuData, model: menu)

@@ -22,7 +22,7 @@ class MenuViewModel: ObservableObject {
               selectedCategoryIndex < data.categories.count else { return [] }
 
         let items = data.categories[selectedCategoryIndex].items
-        return filterStrategy.filter(foodItems: items, allergens: selectedAllergens)
+        return filterStrategy.filter(menuItems: items, allergens: selectedAllergens)
     }
 }
 
@@ -38,14 +38,17 @@ let testMenuData = MenuData(
                     description: "Sourdough with smashed avocado and lemon",
                     price: 6.50,
                     allergens: ["Gluten"],
-                    imageURL: nil
+                    imageURL: nil,
+                    accessibilityInfo: nil
+
                 ),
                 FoodItem(
                     name: "Vegan Wrap",
                     description: "Chickpeas, spinach, and tahini",
                     price: 7.75,
                     allergens: ["Sesame"],
-                    imageURL: nil
+                    imageURL: nil,
+                    accessibilityInfo: nil
                 )
             ]
         ),
@@ -57,14 +60,18 @@ let testMenuData = MenuData(
                     description: "Strong and small",
                     price: 2.50,
                     allergens: [],
-                    imageURL: nil
+                    imageURL: nil,
+                    accessibilityInfo: nil
+
                 ),
                 FoodItem(
                     name: "Latte",
                     description: "Espresso with steamed milk",
                     price: 3.75,
                     allergens: ["Dairy"],
-                    imageURL: nil
+                    imageURL: nil,
+                    accessibilityInfo: nil
+
                 )
             ]
         ),
@@ -76,14 +83,18 @@ let testMenuData = MenuData(
                     description: "Caffeine-free herbal tea",
                     price: 2.25,
                     allergens: [],
-                    imageURL: nil
+                    imageURL: nil,
+                    accessibilityInfo: nil
+
                 ),
                 FoodItem(
                     name: "Matcha",
                     description: "Green tea powder with water or milk",
                     price: 4.00,
                     allergens: ["Dairy"],
-                    imageURL: nil
+                    imageURL: nil,
+                    accessibilityInfo: nil
+
                 )
             ]
         )

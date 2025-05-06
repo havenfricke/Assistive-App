@@ -25,4 +25,7 @@ struct FoodItem: Codable, Identifiable, Equatable, Hashable {
     let price: Double
     let allergens: [String]
     let imageURL: String?
+    
+    let accessibilityInfo: String?
+    var ingredients: [String] = []
 }

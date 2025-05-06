@@ -7,25 +7,26 @@
 import SwiftUI
 
 class OrderManager: ObservableObject {
+    @Published var selectedItems: [OrderItem] = []
     @Published var receivedOrders: [Order] = []
-    
-    init(){
-        PayloadRouter.shared.onReceivedOrder = { [weak self] order in
-            DispatchQueue.main.async{
-                self?.receivedOrders.append(order)
-                print("Order received: \(order.items.count) items")
-            }
+
+    func addOrStack(_ customItem: FoodItem, quantity: Int) {
+        if let index = selectedItems.firstIndex(where: {
+            $0.menuItem.name == customItem.name &&
+            $0.menuItem.ingredients.sorted() == customItem.ingredients.sorted()
+        }) {
+            selectedItems[index].quantity += quantity
+        } else {
+            let newOrderItem = OrderItem(
+                menuItem: customItem,
+                quantity: quantity,
+                originalIngredients: customItem.ingredients
+            )
+            selectedItems.append(newOrderItem)
         }
     }
-    
-    func add(order: Order){
-        receivedOrders.append(order)
-    }
-    
-    func remove(order: Order){
-        receivedOrders.removeAll{ $0.id == order.id }
-    }
 }
+
 
 struct OrdersListView: View {
     @ObservedObject var orderManager: OrderManager
@@ -51,7 +52,7 @@ struct OrdersListView: View {
                 .onDelete { indices in
                     for index in indices{
                         let order = orderManager.receivedOrders[index]
-                        orderManager.remove(order:order)
+                        orderManager.receivedOrders.remove(at: index)
                     }
                 }
             }
@@ -61,9 +62,8 @@ struct OrdersListView: View {
             }
         }.onAppear {
             let testItem = OrderItem(
-                menuItem: FoodItem(name: "Test Coffee", description: nil, price: 2.99, allergens: [], imageURL: nil),
-                quantity: 1
-            )
+                menuItem: FoodItem(name: "Test Coffee", description: nil, price: 2.99, allergens: [], imageURL: nil, accessibilityInfo: nil),
+                quantity: 1, originalIngredients: []            )
             let testOrder = Order(items: [testItem])
             
             do {
