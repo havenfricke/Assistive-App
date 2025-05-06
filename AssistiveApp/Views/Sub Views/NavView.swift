@@ -8,41 +8,64 @@ import SwiftUI
 import SwiftData
 
 struct NavView: View {
-    @State private var isZoomed: Bool = false
-    
+    @EnvironmentObject var navAssetStore: NavigationAssetStore
+
     var body: some View {
         NavigationStack {
-            VStack {
-                Text("General Floor Plan")
-                    .font(.title)
-                Image("FloorPlan")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(height: 300)
-                    .onTapGesture {
-                        isZoomed = true
+            List {
+                ForEach(LocationCategory.allCases) { category in
+                    let assets = navAssetStore.assets(for: category)
+                    if !assets.isEmpty {
+                        NavigationLink(category.displayName) {
+                            NavigationAssetListView(category: category)
+                        }
                     }
-                    .sheet(isPresented: $isZoomed) {
-                        ZoomedImageView(imageName: "FloorPlan")
-                    }
-                Text("Tap the image to zoom in.")
-                    .foregroundColor(.secondary)
-                    .padding(.bottom, 20)
-                NavigationLink(destination: HelpNavigationView()) {
-                    Text("Need Help Navigating")
-                        .font(.largeTitle)
-                        .foregroundColor(.white)
-                        .frame(maxWidth: .infinity, minHeight: 60) // Größere Höhe
-                        .padding()
-                        .background(Color.blue)
-                        .cornerRadius(10)
-                        .shadow(color: .gray, radius: 5, x: 0, y: 5) 
                 }
-                .padding(.horizontal)
-                .navigationTitle("Navigation")
             }
+            .navigationTitle("Navigation")
         }
     }
+}
+struct NavigationAssetListView: View {
+    let category: LocationCategory
+    @EnvironmentObject var navAssetStore: NavigationAssetStore
+
+    var body: some View {
+        List {
+            ForEach(navAssetStore.assets(for: category)) { asset in
+                NavigationLink(asset.name) {
+                    NavigationAssetDetailView(asset: asset)
+                }
+            }
+        }
+        .navigationTitle(category.displayName)
+    }
+}
+struct NavigationAssetDetailView: View {
+    let asset: NavigationAssetDTO
+
+    var body: some View {
+        VStack(spacing: 16) {
+            if let data = asset.imageData, let uiImage = UIImage(data: data) {
+                Image(uiImage: uiImage)
+                    .resizable()
+                    .scaledToFit()
+                    .cornerRadius(12)
+                    .padding()
+            } else {
+                Text("No image available")
+                    .foregroundColor(.secondary)
+            }
+
+            Text(asset.name)
+                .font(.title2)
+                .bold()
+        }
+        .navigationTitle(asset.name)
+    }
+}
+
+
     
     struct HelpNavigationView: View {
         @Query var navImages: [NavModel]
@@ -117,7 +140,6 @@ struct NavView: View {
                 .ignoresSafeArea()
         }
     }
-}
 
 struct ImagePreviewView: View{
     let image: UIImage?
