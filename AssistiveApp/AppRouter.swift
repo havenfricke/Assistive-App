@@ -4,20 +4,22 @@ import SwiftData
 struct AppRouterView: View {
     @Environment(\.modelContext) private var context
     @Query private var profiles: [MobilityProfile]
+    
     @State private var selectedMode: UserMode? = nil
-    @State private var profile: MobilityProfile? = nil
+    @State private var initialized = false
+    @State private var internalProfile: MobilityProfile? = nil
 
     var body: some View {
         contentView
             .onAppear {
-                // Ensure only one profile exists
-                if profile == nil {
+                if !initialized {
+                    initialized = true
                     if let existing = profiles.first {
-                        profile = existing
+                        internalProfile = existing
                     } else {
                         let newProfile = MobilityProfile()
                         context.insert(newProfile)
-                        profile = newProfile
+                        internalProfile = newProfile
                     }
                 }
             }
@@ -31,10 +33,9 @@ struct AppRouterView: View {
                 StaffView()
 
             case .user:
-                if let profile = profile {
+                if let profile = internalProfile {
                     ContentView(profile: profile)
                 } else {
-                    // Fallback UI (shouldn’t happen)
                     Text("Loading profile...")
                 }
             }

@@ -30,6 +30,20 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		F3C243072DCAE3B800330CAB /* Exceptions for "AssistiveAppUITests" folder in "AssistiveAppTests" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				AssistiveAppTests/AssistiveAppTests.swift,
+			);
+			target = 8B5AB7982DA4A87000D57092 /* AssistiveAppTests */;
+		};
+		F3C243082DCAE3B800330CAB /* Exceptions for "AssistiveAppUITests" folder in "AssistiveAppUITests" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				AssistiveAppTests/AssistiveAppTests.swift,
+			);
+			target = 8B5AB7A22DA4A87000D57092 /* AssistiveAppUITests */;
+		};
 		F3D3DEFD2DBD8DCE00DF9E93 /* Exceptions for "AssistiveApp" folder in "AssistiveApp" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -48,13 +62,12 @@
 			path = AssistiveApp;
 			sourceTree = "<group>";
 		};
-		8B5AB79C2DA4A87000D57092 /* AssistiveAppTests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = AssistiveAppTests;
-			sourceTree = "<group>";
-		};
 		8B5AB7A62DA4A87000D57092 /* AssistiveAppUITests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				F3C243072DCAE3B800330CAB /* Exceptions for "AssistiveAppUITests" folder in "AssistiveAppTests" target */,
+				F3C243082DCAE3B800330CAB /* Exceptions for "AssistiveAppUITests" folder in "AssistiveAppUITests" target */,
+			);
 			path = AssistiveAppUITests;
 			sourceTree = "<group>";
 		};
@@ -89,7 +102,6 @@
 			isa = PBXGroup;
 			children = (
 				8B5AB7892DA4A86D00D57092 /* AssistiveApp */,
-				8B5AB79C2DA4A87000D57092 /* AssistiveAppTests */,
 				8B5AB7A62DA4A87000D57092 /* AssistiveAppUITests */,
 				8B5AB7882DA4A86D00D57092 /* Products */,
 			);
@@ -142,9 +154,6 @@
 			);
 			dependencies = (
 				8B5AB79B2DA4A87000D57092 /* PBXTargetDependency */,
-			);
-			fileSystemSynchronizedGroups = (
-				8B5AB79C2DA4A87000D57092 /* AssistiveAppTests */,
 			);
 			name = AssistiveAppTests;
 			packageProductDependencies = (

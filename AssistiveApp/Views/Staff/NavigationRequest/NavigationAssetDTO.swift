@@ -6,19 +6,29 @@
 //
 
 import Foundation
+import SwiftUI
 
-struct NavigationAssetDTO: Codable, Identifiable{
+struct NavigationAssetDTO: Codable, Identifiable {
     let id: UUID
     let name: String
     let category: LocationCategory
     let imageData: Data?
-    
-    init(id: UUID = UUID(), name: String, category: LocationCategory, imageData: Data?){
+    var floorPlanData: Data? // ✅ new field
+
+    init(
+        id: UUID = UUID(),
+        name: String,
+        category: LocationCategory,
+        imageData: Data?,
+        floorPlanData: Data? = nil // ✅ optional
+    ) {
         self.id = id
         self.name = name
         self.category = category
         self.imageData = imageData
+        self.floorPlanData = floorPlanData
     }
+    
 }
 
 extension NavigationAssetDTO {
@@ -29,4 +39,5 @@ extension NavigationAssetDTO {
 
 struct NavigationDataPayload: Codable{
     let assets: [NavigationAssetDTO]
+    let floorPlanData: Data?
 }

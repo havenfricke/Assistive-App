@@ -6,10 +6,12 @@
 //
 
 import Foundation
+import SwiftUI
 
 @MainActor
 class NavigationAssetStore: ObservableObject {
     @Published private(set) var assets: [NavigationAssetDTO] = []
+    @Published var floorPlanImage: UIImage? = nil
     
     static let shared = NavigationAssetStore()
     
@@ -25,5 +27,13 @@ class NavigationAssetStore: ObservableObject {
         Dictionary(grouping:assets, by: \.category)
     }
     
-    
+    func setFloorPlan(from data: Data?) {
+        if let data, let image = UIImage(data: data) {
+            self.floorPlanImage = image
+            print("✅ Floor plan image updated")
+        } else {
+            print("⚠️ Invalid floor plan image data")
+        }
+    }
+
 }

@@ -28,7 +28,7 @@ struct AssistiveApp: App {
     var body: some Scene {
         WindowGroup {
             AppRouterView()
-                .environmentObject(navAssetStore)
+                .environmentObject(NavigationAssetStore.shared)
                 .environmentObject(orderManager)
         }
         .modelContainer(sharedContainer)

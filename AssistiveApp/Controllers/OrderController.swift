@@ -19,7 +19,9 @@ class OrderController {
         let filteredItems = orderItems.filter { orderItem in
             Set(orderItem.menuItem.allergens).isDisjoint(with: Set(allergens))
         }
+        print(allergens)
         // Additional processing (e.g., integration with a POS system, network calls) can be added here.
+        print(filteredItems)
         return filteredItems
     }
 }

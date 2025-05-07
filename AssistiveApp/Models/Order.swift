@@ -12,7 +12,7 @@ struct OrderItem: Identifiable, Codable, Hashable {
     var id = UUID()
     var menuItem: FoodItem
     var quantity: Int
-    var originalIngredients: [String]
+    var selectedIngredients: [String]
 
 }
 

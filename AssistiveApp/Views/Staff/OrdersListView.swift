@@ -10,17 +10,17 @@ class OrderManager: ObservableObject {
     @Published var selectedItems: [OrderItem] = []
     @Published var receivedOrders: [Order] = []
 
-    func addOrStack(_ customItem: FoodItem, quantity: Int) {
+    func addOrStack(_ customItem: OrderItem, quantity: Int) {
         if let index = selectedItems.firstIndex(where: {
-            $0.menuItem.name == customItem.name &&
-            $0.menuItem.ingredients.sorted() == customItem.ingredients.sorted()
+            $0.menuItem.name == customItem.menuItem.name &&
+            $0.selectedIngredients.sorted() == customItem.menuItem.ingredients.sorted()
         }) {
             selectedItems[index].quantity += quantity
         } else {
             let newOrderItem = OrderItem(
-                menuItem: customItem,
+                menuItem: customItem.menuItem,
                 quantity: quantity,
-                originalIngredients: customItem.ingredients
+                selectedIngredients: customItem.selectedIngredients
             )
             selectedItems.append(newOrderItem)
         }
@@ -63,7 +63,7 @@ struct OrdersListView: View {
         }.onAppear {
             let testItem = OrderItem(
                 menuItem: FoodItem(name: "Test Coffee", description: nil, price: 2.99, allergens: [], imageURL: nil, accessibilityInfo: nil),
-                quantity: 1, originalIngredients: []            )
+                quantity: 1, selectedIngredients: [])
             let testOrder = Order(items: [testItem])
             
             do {

@@ -10,6 +10,7 @@ import SwiftUI
 
 struct ProfileView: View {
     @Bindable var profile: MobilityProfile
+    @State private var isEditingProfile = false
     
     var body: some View {
         NavigationStack{
@@ -34,10 +35,16 @@ struct ProfileView: View {
                 }
                 // MARK: - Edit Action
                 Section {
-                    NavigationLink("Edit Profile") {
-                        EditProfileView(profile: profile)
+                    Button("Edit Profile") {
+                        isEditingProfile = true
+                    }
+                    .sheet(isPresented: $isEditingProfile) {
+                        NavigationStack {
+                            EditProfileView(profile: profile)
+                        }
                     }
                 }
+
                 
                 // MARK: - Mobility Info
                 Section(header: Text ("Mobility Info")){

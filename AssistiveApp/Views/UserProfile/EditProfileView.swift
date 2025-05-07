@@ -2,12 +2,11 @@ import SwiftUI
 import PhotosUI
 
 struct EditProfileView: View {
-    @Bindable var profile: MobilityProfile
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var context
 
     @State private var selectedItem: PhotosPickerItem? = nil
-
+    @Bindable var profile:MobilityProfile
     var body: some View {
         Form {
             // MARK: - Identity
@@ -87,8 +86,12 @@ struct EditProfileView: View {
                 }
             }
         }
+        .onAppear{
+            print("editing profile:" , profile.name)
+        }
         .navigationTitle("Edit Profile")
     }
+        
 
     // MARK: - Helper
     func resetProfile() {

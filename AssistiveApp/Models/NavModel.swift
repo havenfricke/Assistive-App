@@ -19,6 +19,8 @@ class NavModel {
     var category: LocationCategory
     @Attribute(.externalStorage)
     var data: Data?
+    @Attribute(.externalStorage)
+    var floorPlanData: Data?
     var image: UIImage? {
         if let data {
             return UIImage(data: data)
@@ -54,7 +56,8 @@ extension NavModel{
         return NavigationAssetDTO(
             name: self.name,
             category: self.category,
-            imageData: self.data
+            imageData: self.data,
+            floorPlanData: self.floorPlanData
         )
     }
 }

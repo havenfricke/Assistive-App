@@ -9,6 +9,8 @@ struct MenuListView: View {
     @State private var selectedMenuItem: FoodItem?
     @State private var selectedAllergens: [String] = []
     @State private var filterStrategy: AllergenFilterStrategy = DefaultAllergenFilter()
+    @State private var originalIngredients: [String] = []
+    let profile: MobilityProfile
     
     @State private var menuItems: [FoodItem] = [
         FoodItem(name: "Burger", description: "Beef with cheese", price: 9.99,
@@ -31,7 +33,10 @@ struct MenuListView: View {
     var filteredItems: [FoodItem] {
         filterStrategy.filter(menuItems: menuItems, allergens: selectedAllergens)
     }
-    
+    private let commonAllergens = [
+        "Milk", "Eggs", "Peanuts", "Tree Nuts",
+        "Wheat", "Soy", "Fish", "Shellfish", "Sesame"
+    ]
     // MARK: - View Body
     var body: some View {
         NavigationView {
@@ -54,8 +59,14 @@ struct MenuListView: View {
                 item: item,
                 quantity: $quantity,
                 selectedIngredients: $selectedIngredients,
+                originalIngredients: originalIngredients,
                 onAdd: { customItem in
-                    orderManager.addOrStack(customItem, quantity:quantity)
+                    let orderItem = OrderItem(
+                        menuItem:customItem,
+                        quantity: quantity,
+                        selectedIngredients: selectedIngredients
+                    )
+                    orderManager.addOrStack(orderItem, quantity: quantity)
                     itemToAdd = nil
                 },
                 onCancel: {
@@ -76,7 +87,7 @@ struct MenuListView: View {
     private var allergenChips: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack {
-                ForEach(["Peanuts", "Dairy", "Gluten", "Soy"], id: \.self) { allergen in
+                ForEach(commonAllergens, id: \.self) { allergen in
                     Button(action: {
                         if selectedAllergens.contains(allergen) {
                             selectedAllergens.removeAll { $0 == allergen }
@@ -102,6 +113,7 @@ struct MenuListView: View {
                 Button {
                     itemToAdd = item
                     quantity = 1
+                    originalIngredients = item.ingredients
                     selectedIngredients = item.ingredients
                 } label: {
                     FoodItemRow(item: item)
@@ -169,6 +181,7 @@ struct FoodItemDetailSheet: View {
     let item: FoodItem
     @Binding var quantity: Int
     @Binding var selectedIngredients: [String]
+    let originalIngredients: [String]
     var onAdd: (FoodItem) -> Void
     var onCancel: () -> Void    
     var body: some View {
@@ -213,7 +226,6 @@ struct FoodItemDetailSheet: View {
 
             Button("Add to Order") {
                 var customItem = item
-                customItem.ingredients = selectedIngredients
                 onAdd(customItem)
             }
             .padding()

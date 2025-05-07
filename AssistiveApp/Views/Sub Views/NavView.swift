@@ -8,13 +8,23 @@ import SwiftUI
 import SwiftData
 
 struct NavView: View {
-    @EnvironmentObject var navAssetStore: NavigationAssetStore
+    @StateObject private var navStore = NavigationAssetStore.shared
+    
 
     var body: some View {
         NavigationStack {
             List {
+                if let image = navStore.floorPlanImage {
+                    Section("Floor Plan"){
+                        Image(uiImage: image)
+                            .resizable()
+                            .scaledToFit()
+                            .cornerRadius(12)
+                            .padding(.vertical, 8)
+                    }
+                }
                 ForEach(LocationCategory.allCases) { category in
-                    let assets = navAssetStore.assets(for: category)
+                    let assets = navStore.assets(for: category)
                     if !assets.isEmpty {
                         NavigationLink(category.displayName) {
                             NavigationAssetListView(category: category)
@@ -25,6 +35,7 @@ struct NavView: View {
             .navigationTitle("Navigation")
         }
     }
+
 }
 struct NavigationAssetListView: View {
     let category: LocationCategory
