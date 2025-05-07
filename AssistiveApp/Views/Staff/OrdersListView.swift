@@ -60,22 +60,8 @@ struct OrdersListView: View {
             .navigationDestination(item: $selectedOrder){ order in
                 OrderDetailView(order:order)
             }
-        }.onAppear {
-            let testItem = OrderItem(
-                menuItem: FoodItem(name: "Test Coffee", description: nil, price: 2.99, allergens: [], imageURL: nil, accessibilityInfo: nil),
-                quantity: 1, selectedIngredients: [])
-            let testOrder = Order(items: [testItem])
-            
-            do {
-                let payload = try Payload(type: .order, model: testOrder)
-                PayloadRouter.shared.handle(payload: payload)
-            } catch {
-                print("❌ Error creating test order payload: \(error)")
-            }
         }
-
     }
-        
 }
 
 struct OrderDetailView: View{

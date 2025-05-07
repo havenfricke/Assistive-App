@@ -5,6 +5,7 @@ import MultipeerConnectivity
 struct StaffView: View {
     @StateObject private var mobilityProfileManager = MobilityProfileManager()
     @StateObject private var alertManager = AlertManager()
+    @StateObject private var staffOrderManager = OrderManager()
 //    @StateObject private var navManager = NavigationHelpRequestManager()
     
     var body: some View {
@@ -16,7 +17,7 @@ struct StaffView: View {
                     .tabItem { Label("Customer Info", systemImage: "person.circle") }
                 MenuBuilderView()
                     .tabItem{Label("Menu Builder", systemImage: "list.bullet.rectangle")}
-                OrdersListView(orderManager: OrderManager())
+                OrdersListView(orderManager: staffOrderManager)
                     .tabItem{Label("Orders", systemImage: "cart.fill")}
                 NavigationAssetManagerView()
                     .tabItem{Label("Navigation Config", systemImage: "map.fill")}
@@ -28,6 +29,12 @@ struct StaffView: View {
             .navigationTitle("Staff Dashboard")
             .onAppear {
                 configurePeerConnection()
+                PayloadRouter.shared.onReceivedOrder = { order in
+                    DispatchQueue.main.async {
+                        staffOrderManager.receivedOrders.append(order)
+                        print("order received and added to list")
+                    }
+                }
             }
         }
     }
