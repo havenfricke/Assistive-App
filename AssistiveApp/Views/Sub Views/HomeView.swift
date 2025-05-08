@@ -18,8 +18,18 @@ struct HomeView: View {
                 Text("Navigate, scan & order with ease.")
                     .foregroundColor(.secondary)
                 
-                Button("Simulate Send Profile"){
-                    simulateSendingProfile()
+                Button("Simulate Connection"){
+                    //ChickFilA
+                    //connectToLocation(_ : "aacfa")
+                    
+                    //cafe32
+                    connectToLocation(_ : "aac32")
+                    
+                    PayloadRouter.shared.onReceivedNavigationData = { payload in
+                        Task { @MainActor in
+                            NavigationAssetStore.shared.updatedAssets(payload.assets)
+                        }
+                    }
                 }
             }
             .padding()
@@ -27,29 +37,11 @@ struct HomeView: View {
         }
         
     }
-    
-    private func simulateSendingProfile(){
-        let dummyProfile = MobilityProfile(
-                    name: "Simulated User",
-                    wheelchairUser: false,
-                    maxTravelDistanceMeters: 20.0,
-                    reachLevel: .moderate,
-                    requiresAssistance: false,
-                    allergens: ["Peanuts"],
-                    notes: "Testing auto-connection",
-                    lastUpdated: Date()
-                )
-
-                do {
-                    let payload = try Payload(type: .mobilityProfile, model: dummyProfile)
-                    PeerConnectionManager.shared.send(payload: payload)
-
-                    print("✅ Simulated MobilityProfile sent.")
-                } catch {
-                    print("❌ Failed to simulate sending profile: \(error)")
-                }
-    }
 }
-#Preview {
-    HomeView()
+
+func connectToLocation(_ netID: String){
+    PeerConnectionManager.shared.serviceType = netID
+    print("Establishing connection: \(netID)")
+    PeerConnectionManager.shared.isStaffMode = false
+    PeerConnectionManager.shared.start()
 }

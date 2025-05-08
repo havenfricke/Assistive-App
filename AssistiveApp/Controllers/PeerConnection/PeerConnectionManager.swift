@@ -14,7 +14,7 @@ class PeerConnectionManager : NSObject {
     
     // MARK: - Configuration
     
-    private let serviceType = "assistiveapp"
+    var serviceType = ""
     
     var isStaffMode: Bool = false {
         didSet {

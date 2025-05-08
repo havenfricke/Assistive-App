@@ -143,6 +143,7 @@ struct ARScannerTabView: View {
     private func performHighConfidenceAction(identifier: String) {
         print("ACTION TRIGGERED FROM QR: \(identifier)")
         let peerConnectionManager = PeerConnectionManager.shared
+        peerConnectionManager.serviceType = identifier
         peerConnectionManager.isStaffMode = false
 
         peerConnectionManager.onPeerConnected = { peerID in

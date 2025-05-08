@@ -8,6 +8,7 @@ import SwiftUI
 import SwiftData
 
 struct NavView: View {
+    @EnvironmentObject var locationDataManager: LocationDataManager
     @StateObject private var navStore = NavigationAssetStore.shared
     let profile: MobilityProfile
     

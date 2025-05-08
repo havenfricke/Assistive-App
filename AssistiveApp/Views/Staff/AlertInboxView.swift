@@ -68,8 +68,3 @@ struct AlertMessage: Identifiable , Hashable, Codable, Equatable{
     let timestamp: Date
 }
 
-#Preview {
-    AlertInboxView(alertManager: AlertManager())
-}
-
-

@@ -1,41 +1,67 @@
 import SwiftUI
 
 struct MenuBuilderView: View {
-    @StateObject private var viewModel: MenuBuilderViewModel
-
-    // Allow injection for previews/testing
-    init(viewModel: MenuBuilderViewModel = MenuBuilderViewModel()) {
-        _viewModel = StateObject(wrappedValue: viewModel)
-    }
+    @ObservedObject var viewModel: MenuBuilderViewModel
+    @State private var selectedCategoryIndex: Int = 0
+    @State private var selectedItem: EditableFoodItem?
 
     var body: some View {
         NavigationStack {
-            Form {
-                LocationSection(viewModel: viewModel)
-                CategoriesTabView(viewModel: viewModel)
+            VStack(alignment: .leading, spacing: 16) {
 
-                Section {
-                    Button("Generate & Send Menu") {
-                        if let menu = viewModel.buildMenuData() {
-                            do {
-                                let payload = try Payload(type: .menuData, model: menu)
-                                PeerConnectionManager.shared.send(payload: payload)
-                                print("✅ Sent menu")
-                            } catch {
-                                print("❌ Failed to send: \(error)")
+                // Category Tabs
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 12) {
+                        ForEach(viewModel.categories.indices, id: \.self) { index in
+                            let isSelected = index == selectedCategoryIndex
+                            Button(action: {
+                                selectedCategoryIndex = index
+                            }) {
+                                Text(viewModel.categories[index].name.isEmpty ? "Untitled" : viewModel.categories[index].name)
+                                    .padding(.horizontal, 12)
+                                    .padding(.vertical, 6)
+                                    .background(isSelected ? Color.blue : Color(.systemGray5))
+                                    .foregroundColor(isSelected ? .white : .primary)
+                                    .cornerRadius(16)
                             }
                         }
+
+                        Button(action: {
+                            viewModel.addCategory()
+                            selectedCategoryIndex = viewModel.categories.count - 1
+                        }) {
+                            Label("Add Category", systemImage: "plus.circle.fill")
+                        }
                     }
+                    .padding(.horizontal)
                 }
+
+                Divider()
+
+                // Category Content Editor
+                if viewModel.categories.indices.contains(selectedCategoryIndex) {
+                    let binding = $viewModel.categories[selectedCategoryIndex]
+                    MenuCategoryEditor(
+                        categoryBinding: binding,
+                        selectedItem: $selectedItem
+                    )
+                    .padding(.horizontal)
+                } else {
+                    Text("No categories yet.")
+                        .foregroundColor(.secondary)
+                        .padding()
+                }
+
+                Spacer()
             }
             .navigationTitle("Menu Builder")
+            .navigationDestination(item: $selectedItem) { item in
+                MenuItemEditor(item: item, categoryBinding: $viewModel.categories[selectedCategoryIndex])
+            }
         }
     }
 }
 
-#Preview {
-    MenuBuilderView(viewModel: MenuBuilderViewModel(previewData: true))
-}
 
 
 struct LocationSection: View{
@@ -88,7 +114,7 @@ struct CategoriesTabView: View {
 
             // Category Editor
             if viewModel.categories.indices.contains(selectedIndex) {
-                CategoryEditor(
+                MenuCategoryEditor(
                     categoryBinding: $viewModel.categories[selectedIndex],
                     selectedItem: $selectedItem   // 🔽 PASSED DOWN
                 )
@@ -101,13 +127,13 @@ struct CategoriesTabView: View {
         }
         // ✅ FIX: Apply navigationDestination here (outside Lazy container)
         .navigationDestination(item: $selectedItem) { item in
-            ItemEditorView(item: item, categoryBinding: $viewModel.categories[selectedIndex])
+            MenuItemEditor.init(item: item, categoryBinding: $viewModel.categories[selectedIndex])
         }
     }
 }
 
 
-struct CategoryEditor: View {
+struct MenuCategoryEditor: View {
     @Binding var categoryBinding: EditableCategory
     @Binding var selectedItem: EditableFoodItem?  // 🔼 Comes from parent
 
@@ -154,7 +180,7 @@ struct CategoryEditor: View {
 }
 
 
-struct ItemEditorView: View{
+struct MenuItemEditor: View{
     var item: EditableFoodItem
     @Binding var categoryBinding:EditableCategory
     @Environment(\.dismiss) var dismiss

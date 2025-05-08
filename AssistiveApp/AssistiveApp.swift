@@ -9,6 +9,7 @@ import SwiftData
 struct AssistiveApp: App {
     @StateObject private var navAssetStore = NavigationAssetStore()
     @StateObject private var orderManager = OrderManager()
+    @StateObject private var locationDataManager = LocationDataManager()
     var sharedContainer: ModelContainer = {
         let schema = Schema([
             Order.self,
@@ -30,6 +31,7 @@ struct AssistiveApp: App {
             AppRouterView()
                 .environmentObject(NavigationAssetStore.shared)
                 .environmentObject(orderManager)
+                .environmentObject(locationDataManager)
         }
         .modelContainer(sharedContainer)
     }

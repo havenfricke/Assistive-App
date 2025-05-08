@@ -6,108 +6,131 @@ struct StaffView: View {
     @StateObject private var mobilityProfileManager = MobilityProfileManager()
     @StateObject private var alertManager = AlertManager()
     @StateObject private var staffOrderManager = OrderManager()
-//    @StateObject private var navManager = NavigationHelpRequestManager()
+    
+    @Environment(\.modelContext) private var modelContext
+    @Query private var navModels: [NavModel]
+    
+    // Choose location ID: "aacfa" or "aac32"
+    private var netID: String = "aac32"
+    
+    @StateObject private var menuBuilderVM: MenuBuilderViewModel
+    
+    init() {
+        switch netID {
+        case "aacfa":
+            _menuBuilderVM = StateObject(wrappedValue: MenuBuilderViewModel(initialData: DemoMenuData.chickFilA()))
+        case "aac32":
+            _menuBuilderVM = StateObject(wrappedValue: MenuBuilderViewModel(initialData: DemoMenuData.cafe32()))
+        default:
+            _menuBuilderVM = StateObject(wrappedValue: MenuBuilderViewModel())
+        }
+    }
     
     var body: some View {
         NavigationView {
             TabView {
                 AlertInboxView(alertManager: alertManager)
                     .tabItem { Label("Alerts", systemImage: "exclamationmark.bubble") }
+                
                 CustomerInfoView(profileManager: mobilityProfileManager)
                     .tabItem { Label("Customer Info", systemImage: "person.circle") }
-                MenuBuilderView()
-                    .tabItem{Label("Menu Builder", systemImage: "list.bullet.rectangle")}
+                
+                MenuBuilderView(viewModel: menuBuilderVM)
+                    .tabItem { Label("Menu Builder", systemImage: "list.bullet.rectangle") }
+                
                 OrdersListView(orderManager: staffOrderManager)
-                    .tabItem{Label("Orders", systemImage: "cart.fill")}
+                    .tabItem { Label("Orders", systemImage: "cart.fill") }
+                
                 NavigationAssetManagerView()
-                    .tabItem{Label("Navigation Config", systemImage: "map.fill")}
-                //LiveNavigationRequestsView(navRequestManager: navManager)
-                //    .tabItem { Label("Nav Requests", systemImage: "arrowshape.turn.up.right") }
-
-
+                    .tabItem { Label("Navigation Config", systemImage: "map.fill") }
             }
             .navigationTitle("Staff Dashboard")
             .onAppear {
                 configurePeerConnection()
-                PayloadRouter.shared.onReceivedOrder = { order in
-                    DispatchQueue.main.async {
-                        staffOrderManager.receivedOrders.append(order)
-                        print("order received and added to list")
-                    }
-                }
+                seedDemoDataIfNeeded()
             }
         }
     }
-    // MARK: - Setup Peer Connection
+    
+    // MARK: - Seed NavModel Demo Data for Staff UI
+    private func seedDemoDataIfNeeded() {
+        guard navModels.isEmpty else {
+            print("✅ NavModels already present")
+            return
+        }
+        
+        let demoAssets: [NavigationAssetDTO]
+        switch netID {
+        case "aacfa":
+            demoAssets = DemoNavigationData.chickFilA()
+        case "aac32":
+            demoAssets = DemoNavigationData.cafe32()
+        default:
+            return
+        }
+        
+        for dto in demoAssets {
+            let model = dto.toNavModel()
+            modelContext.insert(model)
+        }
+        
+        print("✅ Seeded \(demoAssets.count) NavModels into SwiftData")
+    }
+    
+    // MARK: - Peer Connection
     private func configurePeerConnection() {
         let peerManager = PeerConnectionManager.shared
-        peerManager.isStaffMode=true
+        peerManager.serviceType = netID
+        print(peerManager.serviceType)
+        peerManager.isStaffMode = true
         
         peerManager.onPeerConnected = { peer in
             DispatchQueue.main.async {
-                self.sendInitialDataToUser(peerID:peer)
+                self.sendInitialDataToUser(peerID: peer)
             }
         }
-        print("staff device started advertising for user connections.")
+        
+        print("🔊 Staff device started advertising for user connections.")
     }
+    
     private func sendInitialDataToUser(peerID: MCPeerID) {
-        let exampleMenu = MenuData(
-            locationID: UUID().uuidString, // Generate a random ID for now
-            locationName: "Assistive Test Cafe",
-            categories: [
-                MenuCategory(name: "Entrees", items: [
-                    FoodItem(
-                        name: "Classic Burger",
-                        description: "A juicy beef burger with lettuce and tomato.",
-                        price: 9.99,
-                        allergens: ["Gluten", "Dairy"],
-                        imageURL: nil, accessibilityInfo: nil
-                    ),
-                    FoodItem(
-                        name: "Grilled Chicken Sandwich",
-                        description: "Grilled chicken breast on a toasted bun.",
-                        price: 8.49,
-                        allergens: ["Gluten"],
-                        imageURL: nil, accessibilityInfo: nil
-                    )
-                ]),
-                MenuCategory(name: "Drinks", items: [
-                    FoodItem(
-                        name: "Iced Coffee",
-                        description: "Cold brew coffee served over ice.",
-                        price: 3.99,
-                        allergens: [],
-                        imageURL: nil, accessibilityInfo: nil
-                    ),
-                    FoodItem(
-                        name: "Fresh Orange Juice",
-                        description: "Fresh-squeezed orange juice.",
-                        price: 4.49,
-                        allergens: [],
-                        imageURL: nil, accessibilityInfo: nil
-                    )
-                ])
-            ]
-        )
-
-        do {
-            let payload = try Payload(type: .menuData, model: exampleMenu)
-            PeerConnectionManager.shared.send(payload: payload)
-            print("✅ Sent initial MenuData payload to connected user: \(peerID.displayName)")
-        } catch {
-            print("❌ Failed to send initial MenuData payload: \(error)")
+        let navAssets: [NavigationAssetDTO]
+        let menu: MenuData
+        
+        switch netID {
+        case "aacfa":
+            navAssets = DemoNavigationData.chickFilA()
+            menu = DemoMenuData.chickFilA()
+        case "aac32":
+            navAssets = DemoNavigationData.cafe32()
+            menu = DemoMenuData.cafe32()
+        default:
+            print("⚠️ Unknown netID")
+            return
         }
         
+        do {
+            let navPayload = NavigationDataPayload(assets: navAssets, floorPlanData: nil)
+            let navWrapped = try Payload(type: .navigationData, model: navPayload)
+            PeerConnectionManager.shared.send(payload: navWrapped)
+            
+            let menuWrapped = try Payload(type: .menuData, model: menu)
+            PeerConnectionManager.shared.send(payload: menuWrapped)
+            
+            print("📤 Sent initial nav and menu payloads")
+        } catch {
+            print("❌ Failed to send demo data: \(error)")
+        }
     }
 }
-
-
-class MobilityProfileManager: ObservableObject{
+    // MARK: - Managers
+    
+class MobilityProfileManager: ObservableObject {
     @Published var connectedCustomers: [ConnectedCustomer] = []
     
-    init(){
+    init() {
         PayloadRouter.shared.onReceiveMobilityProfile = { [weak self] profile in
-            DispatchQueue.main.async{
+            DispatchQueue.main.async {
                 let connection = ConnectedCustomer(profile: profile, connectedAt: Date())
                 self?.connectedCustomers.append(connection)
             }
@@ -115,25 +138,20 @@ class MobilityProfileManager: ObservableObject{
     }
 }
 
-struct ConnectedCustomer: Identifiable{
+struct ConnectedCustomer: Identifiable {
     let id = UUID()
     let profile: MobilityProfile
     let connectedAt: Date
 }
 
-
-class AlertManager: ObservableObject{
+class AlertManager: ObservableObject {
     @Published var receivedAlerts: [AlertMessage] = []
     
-    init(){
+    init() {
         PayloadRouter.shared.onReceiveAlertMessage = { [weak self] alert in
-            DispatchQueue.main.async{
+            DispatchQueue.main.async {
                 self?.receivedAlerts.append(alert)
             }
         }
     }
-}
-
-#Preview {
-    StaffView()
 }

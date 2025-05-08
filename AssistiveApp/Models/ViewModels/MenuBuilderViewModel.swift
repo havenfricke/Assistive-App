@@ -6,23 +6,44 @@ class MenuBuilderViewModel: ObservableObject {
     @Published var locationName: String
     @Published var categories: [EditableCategory]
 
-    // MARK: - Initializer
+    // MARK: - Initializer (Preview Mode)
     init(previewData: Bool = false) {
         if previewData {
             self.locationID = "PREVIEW-ID"
             self.locationName = "Preview Cafe"
             self.categories = [
                 EditableCategory(name: "Entrees", items: [
-                    EditableFoodItem(name: "Sample Burger", description: "Tasty!", price: 9.99, allergens: ["Gluten", "Dairy"], imageURL: nil)
+                    EditableFoodItem(name: "Sample Burger", description: "Tasty!", price: 9.99, allergens: ["Gluten", "Dairy"], imageURL: nil, accessibilityInfo: nil)
                 ]),
                 EditableCategory(name: "Drinks", items: [
-                    EditableFoodItem(name: "Iced Coffee", description: "Chilled and smooth.", price: 3.5, allergens: [], imageURL: nil)
+                    EditableFoodItem(name: "Iced Coffee", description: "Chilled and smooth.", price: 3.5, allergens: [], imageURL: nil, accessibilityInfo: nil)
                 ])
             ]
         } else {
             self.locationID = UUID().uuidString
             self.locationName = ""
             self.categories = []
+        }
+    }
+
+    // ✅ MARK: - Initializer (Injecting MenuData)
+    init(initialData: MenuData) {
+        self.locationID = initialData.locationID
+        self.locationName = initialData.locationName
+        self.categories = initialData.categories.map { cat in
+            EditableCategory(
+                name: cat.name,
+                items: cat.items.map { item in
+                    EditableFoodItem(
+                        name: item.name,
+                        description: item.description,
+                        price: item.price,
+                        allergens: item.allergens,
+                        imageURL: item.imageURL,
+                        accessibilityInfo: item.accessibilityInfo
+                    )
+                }
+            )
         }
     }
 
@@ -46,11 +67,12 @@ class MenuBuilderViewModel: ObservableObject {
                     price: $0.price,
                     allergens: $0.allergens,
                     imageURL: $0.imageURL,
-                    accessibilityInfo: $0.accessibilityInfo
+                    accessibilityInfo: $0.accessibilityInfo,
+                    ingredients: [] // optional: add if your model supports it
                 )
-            }
-        )
-    }
+            })
+        }
+
         return MenuData(locationID: locationID, locationName: locationName, categories: menuCategories)
     }
 }
