@@ -42,8 +42,13 @@ struct AlertInboxView: View {
     }
 }
     private func simulateIncomingAlert() {
+        let dummyLocation = NavigationAssetDTO(
+            name: "Table 8",
+            category: .table,
+            imageData: nil)
         let simulatedAlert = AlertMessage(
                     content: "Test Help Request",
+                    location: dummyLocation,
                     customerName: "Simulated User",
                     timestamp: Date()
                 )
@@ -55,9 +60,10 @@ struct AlertInboxView: View {
                 }
         }
 
-struct AlertMessage: Identifiable , Hashable, Codable{
+struct AlertMessage: Identifiable , Hashable, Codable, Equatable{
     let id = UUID()
     let content: String
+    let location: NavigationAssetDTO
     let customerName: String?
     let timestamp: Date
 }
@@ -65,3 +71,5 @@ struct AlertMessage: Identifiable , Hashable, Codable{
 #Preview {
     AlertInboxView(alertManager: AlertManager())
 }
+
+

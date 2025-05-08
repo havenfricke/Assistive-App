@@ -56,8 +56,7 @@ extension NavModel{
         return NavigationAssetDTO(
             name: self.name,
             category: self.category,
-            imageData: self.data,
-            floorPlanData: self.floorPlanData
+            imageData: self.data
         )
     }
 }

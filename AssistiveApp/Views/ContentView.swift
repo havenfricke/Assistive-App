@@ -24,7 +24,7 @@ struct ContentView: View {
                 .tabItem { Label("Order", systemImage: "cart") }
             ProfileView(profile:profile)
                 .tabItem { Label("Profile View", systemImage: "gearshape") }
-            NavView().tabItem { Label("Navigation", systemImage: "map") }
+            NavView(profile:profile).tabItem { Label("Navigation", systemImage: "map") }
         }
     }
 }
