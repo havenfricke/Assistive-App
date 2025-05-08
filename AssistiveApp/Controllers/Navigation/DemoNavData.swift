@@ -17,7 +17,8 @@ struct DemoNavigationData {
             NavigationAssetDTO(name: "Main Restroom", category: .restroom, imageData: imageData(named: "Table3")),
             NavigationAssetDTO(name: "Side Restroom", category: .restroom, imageData: imageData(named: "Table4")),
             NavigationAssetDTO(name: "Condiment Bar", category: .customerStation, imageData: imageData(named: "CondimentBar")),
-            NavigationAssetDTO(name: "Drink Refill", category: .customerStation, imageData: imageData(named: "Fridge"))
+            NavigationAssetDTO(name: "Drink Refill", category: .customerStation, imageData: imageData(named: "Fridge")),
+            NavigationAssetDTO(name: "cfa_floorplan", category: .other, imageData: imageData(named: "cfa_floorplan"))
         ]
     }
 
@@ -28,7 +29,9 @@ struct DemoNavigationData {
             NavigationAssetDTO(name: "Restroom A", category: .restroom, imageData: imageData(named: "Table7")),
             NavigationAssetDTO(name: "Restroom B", category: .restroom, imageData: imageData(named: "Table8")),
             NavigationAssetDTO(name: "Sugar Station", category: .customerStation, imageData: imageData(named: "Table9")),
-            NavigationAssetDTO(name: "Fridge Grab-N-Go", category: .customerStation, imageData: imageData(named: "Table10"))
+            NavigationAssetDTO(name: "Fridge Grab-N-Go", category: .customerStation, imageData: imageData(named: "Table10")),
+            NavigationAssetDTO(name: "c32_floorplan", category: .other, imageData: imageData(named: "c32_floorplan"))
+
         ]
     }
 

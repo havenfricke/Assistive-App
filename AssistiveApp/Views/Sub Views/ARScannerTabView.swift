@@ -7,36 +7,20 @@ struct ARScannerTabView: View {
     @Environment(\.modelContext) private var modelContext
     @Query private var accessPoints: [AccessPoint]
 
+    @State private var selectedAccessPoint: AccessPoint?
     @State private var showRetryPrompt = false
     @State private var showScanner = false
 
     var body: some View {
         NavigationSplitView {
-            List {
+            List(selection: $selectedAccessPoint) {
                 ForEach(accessPoints) { point in
-                    NavigationLink {
-                        VStack(alignment: .leading, spacing: 12) {
-                            Text(point.desc)
-                                .font(.title3)
-                                .bold()
-                            Text("Scanned at: \(point.netID)")
-                                .font(.footnote)
-                                .foregroundColor(.secondary)
-                            Spacer()
-                        }
-                        .padding()
-                    } label: {
-                        VStack(alignment: .leading) {
-                            Text(point.desc)
-                                .font(.headline)
-                            Text(point.netID)
-                                .font(.caption)
-                                .foregroundColor(.gray)
-                        }
-                    }
+                    Text(point.desc)
+                        .tag(point)
                 }
                 .onDelete(perform: deleteItems)
             }
+            .navigationTitle("Scanned Points")
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     EditButton()
@@ -54,40 +38,54 @@ struct ARScannerTabView: View {
                     }
                 }
             }
-            .sheet(isPresented: $showScanner) {
-                ScannerViewControllerWrapper { scannedValue in
-                    handleScan(value: scannedValue)
-                    showScanner = false
-                }
-                .ignoresSafeArea()
-            }
         } detail: {
-            ZStack {
-                Text("Select an item")
-                    .font(.title3)
-                    .foregroundColor(.secondary)
+            if let point = selectedAccessPoint {
+                VStack(alignment: .leading, spacing: 12) {
+                    Text(point.desc)
+                        .font(.title3)
+                        .bold()
+                    Text("Scanned at: \(point.netID)")
+                        .font(.footnote)
+                        .foregroundColor(.secondary)
+                    Spacer()
+                }
+                .padding()
+            } else {
+                ZStack {
+                    Text("Select an item")
+                        .font(.title3)
+                        .foregroundColor(.secondary)
 
-                if showRetryPrompt {
-                    VStack {
-                        Text("No staff device found.")
-                            .font(.headline)
+                    if showRetryPrompt {
+                        VStack {
+                            Text("No staff device found.")
+                                .font(.headline)
+                                .padding()
+                            Button("Retry") {
+                                showRetryPrompt = false
+                                PeerConnectionManager.shared.start()
+                            }
                             .padding()
-                        Button("Retry") {
-                            showRetryPrompt = false
-                            PeerConnectionManager.shared.start()
+                            .background(Color.blue)
+                            .foregroundColor(.white)
+                            .cornerRadius(10)
                         }
+                        .background(Color.black.opacity(0.7))
+                        .cornerRadius(16)
                         .padding()
-                        .background(Color.blue)
-                        .foregroundColor(.white)
-                        .cornerRadius(10)
                     }
-                    .background(Color.black.opacity(0.7))
-                    .cornerRadius(16)
-                    .padding()
                 }
             }
         }
+        .sheet(isPresented: $showScanner) {
+            ScannerViewControllerWrapper { scannedValue in
+                handleScan(value: scannedValue)
+                showScanner = false
+            }
+            .ignoresSafeArea()
+        }
     }
+
 
     // MARK: - Item Actions
 

@@ -10,32 +10,29 @@ import SwiftUI
 
 struct HomeView: View {
     var body: some View {
-        NavigationView {
-            VStack(spacing: 20) {
-                Text("Welcome to Assistive")
-                    .font(.largeTitle)
-                    .bold()
-                Text("Navigate, scan & order with ease.")
-                    .foregroundColor(.secondary)
+        VStack(spacing: 20) {
+            Text("Welcome to Assistive")
+                .font(.largeTitle)
+                .bold()
+            Text("Navigate, scan & order with ease.")
+                .foregroundColor(.secondary)
+            
+            Button("Simulate Connection"){
+                //ChickFilA
+                //connectToLocation(_ : "aacfa")
                 
-                Button("Simulate Connection"){
-                    //ChickFilA
-                    //connectToLocation(_ : "aacfa")
-                    
-                    //cafe32
-                    connectToLocation(_ : "aac32")
-                    
-                    PayloadRouter.shared.onReceivedNavigationData = { payload in
-                        Task { @MainActor in
-                            NavigationAssetStore.shared.updatedAssets(payload.assets)
-                        }
+                //cafe32
+                connectToLocation(_ : "aac32")
+                
+                PayloadRouter.shared.onReceivedNavigationData = { payload in
+                    Task { @MainActor in
+                        NavigationAssetStore.shared.updatedAssets(payload.assets)
                     }
                 }
             }
-            .padding()
-            .navigationTitle("Home")
         }
-        
+        .padding()
+        .navigationTitle("Home")
     }
 }
 

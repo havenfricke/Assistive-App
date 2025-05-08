@@ -27,56 +27,70 @@ struct OrderView: View {
     }
     
     var body: some View {
-        NavigationView {
-            VStack {
-                Toggle("Toggle Allergen Filtering", isOn: $filterAllergens)
-                    .padding(.horizontal)
+        VStack {
+            Toggle("Toggle Allergen Filtering", isOn: $filterAllergens)
+                .padding(.horizontal)
+            if displayedItems.isEmpty {
+                VStack(spacing: 12) {
+                    Image(systemName: "cart.badge.plus")
+                        .font(.system(size: 40))
+                        .foregroundColor(.gray)
+                    Text("Your order is empty.")
+                        .font(.headline)
+                        .foregroundColor(.secondary)
+                    Text("Go to the menu to add items to your order.")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                }
+                .padding(.top, 40)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+            } else {
                 List {
                     Section(header: Text("Selected Items")) {
                         ForEach(displayedItems) { item in
                             OrderItemRow(item:item)
-                        }.environmentObject(orderManager)
+                        }
+                        .environmentObject(orderManager)
                         .padding(.vertical, 4)
                     }
                 }
                 .listStyle(InsetGroupedListStyle())
                 .navigationTitle("Your Order")
-                
+            }
+            
+            Spacer()
+            HStack{
+                Text("Total:")
+                    .font(.headline)
                 Spacer()
-                HStack{
-                    Text("Total:")
-                        .font(.headline)
-                    Spacer()
-                    Text(String(format: "$%.2f", cartTotal))
-                        .font(.headline)
-                }
-                .padding(.horizontal)
-                .padding(.top, 8)
-                Button(action: {
-                    checkOut()
-                }){
-                    Text("Checkout")
-                        .bold()
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(Color.blue)
-                        .foregroundColor(.white)
-                        .cornerRadius(8)
-                        .padding(.horizontal)
-                        .padding(.bottom,10)
-                }
-                .disabled(displayedItems.isEmpty)
-                
-                if !filteredItems.isEmpty {
-                    Text("Filtered Items (Allergen-safe):")
-                        .font(.headline)
-                    List(filteredItems) { item in
-                        Text(item.menuItem.name)
-                    }
+                Text(String(format: "$%.2f", cartTotal))
+                    .font(.headline)
+            }
+            .padding(.horizontal)
+            .padding(.top, 8)
+            Button(action: {
+                checkOut()
+            }){
+                Text("Checkout")
+                    .bold()
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(Color.blue)
+                    .foregroundColor(.white)
+                    .cornerRadius(8)
+                    .padding(.horizontal)
+                    .padding(.bottom,10)
+            }
+            .disabled(displayedItems.isEmpty)
+            
+            if !filteredItems.isEmpty {
+                Text("Filtered Items (Allergen-safe):")
+                    .font(.headline)
+                List(filteredItems) { item in
+                    Text(item.menuItem.name)
                 }
             }
         }
-
     }
     func checkOut(){
         let order = Order(items:orderManager.selectedItems)

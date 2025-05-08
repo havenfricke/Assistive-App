@@ -27,28 +27,26 @@ struct StaffView: View {
     }
     
     var body: some View {
-        NavigationView {
-            TabView {
-                AlertInboxView(alertManager: alertManager)
-                    .tabItem { Label("Alerts", systemImage: "exclamationmark.bubble") }
-                
-                CustomerInfoView(profileManager: mobilityProfileManager)
-                    .tabItem { Label("Customer Info", systemImage: "person.circle") }
-                
-                MenuBuilderView(viewModel: menuBuilderVM)
-                    .tabItem { Label("Menu Builder", systemImage: "list.bullet.rectangle") }
-                
-                OrdersListView(orderManager: staffOrderManager)
-                    .tabItem { Label("Orders", systemImage: "cart.fill") }
-                
-                NavigationAssetManagerView()
-                    .tabItem { Label("Navigation Config", systemImage: "map.fill") }
-            }
-            .navigationTitle("Staff Dashboard")
-            .onAppear {
-                configurePeerConnection()
-                seedDemoDataIfNeeded()
-            }
+        TabView {
+            AlertInboxView(alertManager: alertManager)
+                .tabItem { Label("Alerts", systemImage: "exclamationmark.bubble") }
+            
+            CustomerInfoView(profileManager: mobilityProfileManager)
+                .tabItem { Label("Customer Info", systemImage: "person.circle") }
+            
+            MenuBuilderView(viewModel: menuBuilderVM)
+                .tabItem { Label("Menu Builder", systemImage: "list.bullet.rectangle") }
+            
+            OrdersListView(orderManager: staffOrderManager)
+                .tabItem { Label("Orders", systemImage: "cart.fill") }
+            
+            NavigationAssetManagerView()
+                .tabItem { Label("Navigation Config", systemImage: "map.fill") }
+        }
+        .navigationTitle("Staff Dashboard")
+        .onAppear {
+            configurePeerConnection()
+            seedDemoDataIfNeeded()
         }
     }
     
@@ -110,7 +108,8 @@ struct StaffView: View {
         }
         
         do {
-            let navPayload = NavigationDataPayload(assets: navAssets, floorPlanData: nil)
+            let floorplanAsset = navAssets.first(where: { $0.name.lowercased().contains("floorplan")})
+            let navPayload = NavigationDataPayload(assets: navAssets, floorPlanData: floorplanAsset?.imageData)
             let navWrapped = try Payload(type: .navigationData, model: navPayload)
             PeerConnectionManager.shared.send(payload: navWrapped)
             

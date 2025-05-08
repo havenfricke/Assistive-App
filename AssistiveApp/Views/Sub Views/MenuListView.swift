@@ -12,45 +12,52 @@ struct MenuListView: View {
     @State private var selectedAllergens: [String] = []
     @State private var filterStrategy: AllergenFilterStrategy = DefaultAllergenFilter()
     @State private var originalIngredients: [String] = []
-    let profile: MobilityProfile
     @State private var menuCategories: [MenuCategory] = []
     
     @State private var showAddToOrderPopup = false
     @State private var quantity = 1
     @State private var itemToAdd: FoodItem? = nil
     @State private var selectedIngredients: [String] = []
-    
+    @State private var filterAllergens = true
+
+    let profile: MobilityProfile
+
     // MARK: - Filtering
     var filteredCategories: [MenuCategory] {
         menuCategories.map { category in
-            let filtered = filterStrategy.filter(menuItems: category.items, allergens: selectedAllergens)
-            return MenuCategory(name: category.name, items: filtered)
+            let items = filterAllergens
+                ? filterStrategy.filter(menuItems: category.items, allergens: profile.allergens)
+                : category.items
+            return MenuCategory(name: category.name, items: items)
         }
         .filter { !$0.items.isEmpty }
     }
+
     private let commonAllergens = [
         "Milk", "Eggs", "Peanuts", "Tree Nuts",
         "Wheat", "Soy", "Fish", "Shellfish", "Sesame"
     ]
+
     // MARK: - View Body
     var body: some View {
-        NavigationView {
-            VStack(alignment: .leading) {
-                Spacer().frame(height: 20)
-                
-                allergenFilterHeader
-                
-                allergenChips
-                
-                menuList
-                
-                Spacer()
-            }
-            .padding(.top)
-            .navigationTitle("Menu")
-            .onReceive(locationDataManager.$menuData.compactMap { $0 }) {newMenu in
-                menuCategories = newMenu.categories
-            }
+        VStack(alignment: .leading) {
+            Spacer().frame(height: 20)
+            
+            Toggle("Filter menu using your allergens", isOn: $filterAllergens)
+                .padding(.horizontal)
+            
+            allergenFilterHeader
+            
+            allergenChips
+            
+            menuList
+            
+            Spacer()
+        }
+        .padding(.top)
+        .navigationTitle("Menu")
+        .onReceive(locationDataManager.$menuData.compactMap { $0 }) { newMenu in
+            menuCategories = newMenu.categories
         }
         .sheet(item: $itemToAdd) { item in
             FoodItemDetailSheet(
@@ -60,7 +67,7 @@ struct MenuListView: View {
                 originalIngredients: originalIngredients,
                 onAdd: { customItem in
                     let orderItem = OrderItem(
-                        menuItem:customItem,
+                        menuItem: customItem,
                         quantity: quantity,
                         selectedIngredients: selectedIngredients
                     )
@@ -73,15 +80,15 @@ struct MenuListView: View {
             )
         }
     }
-    
+
     // MARK: - Subviews
     
     private var allergenFilterHeader: some View {
-        Text("Filter by Allergens")
+        Text("Select Allergens to Filter")
             .font(.headline)
             .padding(.horizontal)
     }
-    
+
     private var allergenChips: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack {
@@ -104,7 +111,7 @@ struct MenuListView: View {
             .padding(.horizontal)
         }
     }
-    
+
     private var menuList: some View {
         List {
             ForEach(filteredCategories, id: \.name) { category in
@@ -124,7 +131,7 @@ struct MenuListView: View {
             }
         }
     }
-    
+
     struct FoodItemRow: View {
         let item: FoodItem
         
@@ -144,7 +151,7 @@ struct MenuListView: View {
                 )
             }
         }
-        
+
         var body: some View {
             HStack {
                 imageView
@@ -177,7 +184,7 @@ struct MenuListView: View {
             }
         }
     }
-    
+
     struct FoodItemDetailSheet: View {
         let item: FoodItem
         @Binding var quantity: Int
@@ -185,6 +192,7 @@ struct MenuListView: View {
         let originalIngredients: [String]
         var onAdd: (FoodItem) -> Void
         var onCancel: () -> Void
+
         var body: some View {
             VStack(spacing: 20) {
                 if let image = item.imageURL {
@@ -195,16 +203,16 @@ struct MenuListView: View {
                         .cornerRadius(12)
                         .padding(.top)
                 }
-                
+
                 Text("Add \(item.name)")
                     .font(.title2)
-                
+
                 Stepper("Quantity: \(quantity)", value: $quantity, in: 1...99)
                     .padding()
-                
+
                 Text("Edit Ingredients")
                     .font(.headline)
-                
+
                 ScrollView {
                     VStack(alignment: .leading) {
                         ForEach(item.ingredients, id: \.self) { ingredient in
@@ -224,7 +232,7 @@ struct MenuListView: View {
                     }
                     .padding(.horizontal)
                 }
-                
+
                 Button("Add to Order") {
                     var customItem = item
                     onAdd(customItem)
@@ -233,7 +241,7 @@ struct MenuListView: View {
                 .background(Color.blue)
                 .foregroundColor(.white)
                 .cornerRadius(8)
-                
+
                 Button("Cancel") {
                     onCancel()
                 }
@@ -242,7 +250,4 @@ struct MenuListView: View {
             .padding()
         }
     }
-    
 }
-
-

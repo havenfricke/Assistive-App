@@ -67,7 +67,11 @@ struct NavigationAssetManagerView: View {
                     Button("Send Navigation Data") {
                         do {
                             let dtoList = samples.map { $0.toDTO() }
-                            let payload = NavigationDataPayload(assets: dtoList, floorPlanData: floorPlanImageData)
+                            let floorplanDTO = dtoList.first { $0.name.lowercased().contains("floorplan") }
+                            let payload = NavigationDataPayload(
+                                assets: dtoList,
+                                floorPlanData: floorPlanImageData ?? floorplanDTO?.imageData
+                            )
                             let wrappedPayload = try Payload(type: .navigationData, model: payload)
                             PeerConnectionManager.shared.send(payload: wrappedPayload)
                             print("📦 Sent navigation data with \(dtoList.count) assets and floor plan")
@@ -91,6 +95,14 @@ struct NavigationAssetManagerView: View {
                 }
             }
             .sheet(item: $formType) { $0 }
+            .onAppear {
+                if floorPlanImageData == nil {
+                    if let autoFloor = samples.first(where: { $0.name.lowercased().contains("floorplan") })?.data {
+                        floorPlanImageData = autoFloor
+                        print("✅ Auto-loaded floor plan image from DTO")
+                    }
+                }
+            }
         }
     }
 }
