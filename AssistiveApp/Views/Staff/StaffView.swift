@@ -11,7 +11,7 @@ struct StaffView: View {
     @Query private var navModels: [NavModel]
     
     // Choose location ID: "aacfa" or "aac32"
-    private var netID: String = "aac32"
+    private var netID: String = "aacfa"
     
     @StateObject private var menuBuilderVM: MenuBuilderViewModel
     

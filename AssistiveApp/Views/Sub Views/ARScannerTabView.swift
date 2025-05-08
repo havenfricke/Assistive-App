@@ -124,10 +124,11 @@ struct ARScannerTabView: View {
                             let newItem = AccessPoint(
                                 netID: Date().formatted(date: .numeric, time: .standard),
                                 desc: combinedText
+                                
                             )
+                            performHighConfidenceAction(identifier: item.netID)
                             modelContext.insert(newItem)
                         }
-                        performHighConfidenceAction(identifier: item.netID)
                     }
                 } else {
                     print("Decoding failed")

@@ -4,7 +4,8 @@
 <dict>
 	<key>NSBonjourServices</key>
 	<array>
-		<string>_assistiveapp._tcp</string>
+		<string>_aacfa._tcp</string>
+		<string>_aac32._tcp</string>
 	</array>
 </dict>
 </plist>
