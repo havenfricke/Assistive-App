@@ -14,9 +14,11 @@ class OrderController {
         self.allergenFilter = filter
     }
     
-    /// Processes the order by filtering menu items based on user allergens.
-    func processOrder(menuItems: [MenuItem], withAllergens allergens: [String]) -> [MenuItem] {
-        let filteredItems = allergenFilter.filter(menuItems: menuItems, allergens: allergens)
+    /// Processes the order by filtering order items based on user allergens.
+    func processOrder(orderItems: [OrderItem], withAllergens allergens: [String]) -> [OrderItem] {
+        let filteredItems = orderItems.filter { orderItem in
+            Set(orderItem.menuItem.allergens).isDisjoint(with: Set(allergens))
+        }
         // Additional processing (e.g., integration with a POS system, network calls) can be added here.
         return filteredItems
     }

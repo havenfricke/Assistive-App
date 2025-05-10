@@ -7,9 +7,11 @@ import SwiftData
 
 @main
 struct AssistiveApp: App {
+    // ** NEW **
+    @StateObject private var orderManager = OrderManager()
+    
     var sharedContainer: ModelContainer = {
         let schema = Schema([
-            MenuItem.self,
             Order.self,
             Location.self,
             Customer.self,
@@ -26,7 +28,10 @@ struct AssistiveApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
+            // ** NEW **
+                .environmentObject(orderManager)
         }
         .modelContainer(sharedContainer)
+        
     }
 }

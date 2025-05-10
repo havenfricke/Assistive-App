@@ -17,8 +17,7 @@ class DefaultAllergenFilter: AllergenFilterStrategy {
     func filter(menuItems: [MenuItem], allergens: [String]) -> [MenuItem] {
         menuItems.filter { item in
             // If the item has allergens that intersect with the user's allergens, it will be excluded.
-            guard let itemAllergens = item.allergens else { return true }
-            return Set(itemAllergens).isDisjoint(with: Set(allergens))
+            Set(item.allergens).isDisjoint(with: Set(allergens))
         }
     }
 }
